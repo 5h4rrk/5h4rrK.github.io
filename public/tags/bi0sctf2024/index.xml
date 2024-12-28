@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Log Analysis on 5h4rrk </title>
-    <link>http://localhost:1313/tags/log-analysis/</link>
-    <description>Recent content in Log Analysis on 5h4rrk </description>
+    <title>Bi0sCTF2024 on 5h4rrk </title>
+    <link>http://localhost:1313/tags/bi0sctf2024/</link>
+    <description>Recent content in Bi0sCTF2024 on 5h4rrk </description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Fri, 08 Mar 2024 07:51:58 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/log-analysis/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/bi0sctf2024/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ReAL-File-System-bi0sCTF2024</title>
       <link>http://localhost:1313/posts/resilient-file-system/</link>

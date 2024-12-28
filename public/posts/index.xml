@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on ~/home/5h4rrK $</title>
-    <link>https://5h4rrK.github.io/posts/</link>
-    <description>Recent content in Posts on ~/home/5h4rrK $</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <title>Posts on 5h4rrk </title>
+    <link>http://localhost:1313/posts/</link>
+    <description>Recent content in Posts on 5h4rrk </description>
+    <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 28 Feb 2024 23:40:43 +0530</lastBuildDate>
-    <atom:link href="https://5h4rrK.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 08 Mar 2024 07:51:58 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>ReAL-File-System</title>
-      <link>https://5h4rrK.github.io/posts/resilient-file-system/</link>
-      <pubDate>Wed, 28 Feb 2024 23:40:43 +0530</pubDate>
-      <guid>https://5h4rrK.github.io/posts/resilient-file-system/</guid>
-      <description>Log Analysis of Resilient File Sytem</description>
+      <title>ReAL-File-System-bi0sCTF2024</title>
+      <link>http://localhost:1313/posts/resilient-file-system/</link>
+      <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
+      <guid>http://localhost:1313/posts/resilient-file-system/</guid>
+      <description>&lt;p&gt;Full detailed writeup for ReAL-File-System which is centered around ReFS Log Analysis.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;tl;dr&lt;/strong&gt;&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Disk Forensics&lt;/li&gt;&#xA;&lt;li&gt;Resilient File System&lt;/li&gt;&#xA;&lt;li&gt;Log Analysis&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
     </item>
     <item>
       <title>Network-KeyLogger</title>
-      <link>https://5h4rrK.github.io/posts/keyboard-pcap/</link>
+      <link>http://localhost:1313/posts/keyboard-pcap/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrK.github.io/posts/keyboard-pcap/</guid>
+      <guid>http://localhost:1313/posts/keyboard-pcap/</guid>
       <description>how to decode the keystrokes from the pcap</description>
     </item>
   </channel>

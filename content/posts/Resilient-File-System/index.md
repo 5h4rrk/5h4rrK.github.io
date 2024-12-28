@@ -1,8 +1,8 @@
 ---
 title: ReAL-File-System-bi0sCTF2024
 date: 2024-03-08 07:51:58
-author: 5h4rrK
-author_url: https://twitter.com/5h4rrK
+author: 5h4rrk
+author_url: https://twitter.com/5h4rrk
 categories:
   - Forensics
 tags:
