@@ -3,7 +3,10 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+    <lastmod>2025-01-11T17:00:50+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-01-11T17:00:50+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/debugging/</loc>
     <lastmod>2025-01-11T17:00:50+05:30</lastmod>
@@ -12,9 +15,6 @@
     <lastmod>2025-01-11T17:00:50+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/pe-parse-windbg/</loc>
-    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/posts/</loc>
     <lastmod>2025-01-11T17:00:50+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/reverse-engineering/</loc>

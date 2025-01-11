@@ -3,7 +3,7 @@ title = 'PE Parsing with WinDbg'
 date = 2025-01-11T17:00:50+05:30
 tags = ['WinDbg', 'PE Parsing', 'Debugging', 'Reverse Engineering', 'Windows Internals']
 summary = 'Hands on parsing PE files with WinDbg and explore their structures for debugging and reverse engineering.'
-draft = true
+draft = false
 +++
 
 #### PE Structure 
