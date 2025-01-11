@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Windows Internals on 5h4rrk </title>
+    <link>http://localhost:1313/tags/windows-internals/</link>
+    <description>Recent content in Windows Internals on 5h4rrk </description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 11 Jan 2025 17:00:50 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/windows-internals/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PE Parsing with WinDbg</title>
+      <link>http://localhost:1313/posts/pe-parse-windbg/</link>
+      <pubDate>Sat, 11 Jan 2025 17:00:50 +0530</pubDate>
+      <guid>http://localhost:1313/posts/pe-parse-windbg/</guid>
+      <description>Hands on parsing PE files with WinDbg and explore their structures for debugging and reverse engineering.</description>
+    </item>
+  </channel>
+</rss>

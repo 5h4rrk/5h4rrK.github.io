@@ -33,12 +33,12 @@ weight = 10
 
     [languages.en.params.profileMode]
     enabled = true
-    title = "Sabhya/सभ्य  "
+    title = "5h4rrk"
     imageUrl = "https://avatars.githubusercontent.com/u/89577007"
     imageTitle = "Profile image"
     imageWidth = 120
     imageHeight = 120
-    subtitle = " :)"
+    subtitle = " ~/"
 
       [[languages.en.params.profileMode.buttons]]
       name = "Blog"
@@ -47,7 +47,7 @@ weight = 10
 [params]
 env = "production"
 description = "5h4rrk's blog"
-author = "Sabhya"
+author = "5h4rrk"
 defaultTheme = "auto"
 ShowShareButtons = true
 ShowReadingTime = true

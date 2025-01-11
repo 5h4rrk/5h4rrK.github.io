@@ -3,7 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2024-03-08T07:51:58+00:00</lastmod>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/debugging/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/pe-parsing/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/pe-parse-windbg/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/reverse-engineering/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windbg/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windows-internals/</loc>
+    <lastmod>2025-01-11T17:00:50+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/bi0sctf2024/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
@@ -23,9 +47,6 @@
     <loc>http://localhost:1313/tags/log-analysis/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2024-03-08T07:51:58+00:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/posts/resilient-file-system/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
@@ -33,9 +54,6 @@
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/resilient-file-system/</loc>
-    <lastmod>2024-03-08T07:51:58+00:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/ctf/</loc>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Assembly on 5h4rrk </title>
+    <link>http://localhost:1313/tags/assembly/</link>
+    <description>Recent content in Assembly on 5h4rrk </description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 11 Jan 2025 10:54:39 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/assembly/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Walking PEB with WinDbg and Assembly</title>
+      <link>http://localhost:1313/posts/windows-peb/</link>
+      <pubDate>Sat, 11 Jan 2025 10:54:39 +0530</pubDate>
+      <guid>http://localhost:1313/posts/windows-peb/</guid>
+      <description>Dive into the depths of the Windows Process Environment Block (PEB) using WinDbg and Assembly.</description>
+    </item>
+  </channel>
+</rss>
