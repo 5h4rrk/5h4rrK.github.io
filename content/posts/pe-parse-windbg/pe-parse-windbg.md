@@ -1,5 +1,5 @@
 ---
-title: PE Parsing with WinDbg
+title : Decoding PE Files A Step-by-Step Guide with WinDbg - Part 1
 date: 2025-01-11 17:00:50
 author: Unknown
 author_url: 
@@ -12,7 +12,7 @@ tags:
   - Reverse Engineering
   - Windows Internals
 summary: Hands-on parsing PE files with WinDbg and exploring their structures for debugging and reverse engineering.
-draft: false
+draft: true
 ---
 
 
