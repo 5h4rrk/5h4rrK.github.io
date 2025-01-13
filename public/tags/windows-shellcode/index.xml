@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Assembly on 5h4rrk </title>
-    <link>https://5h4rrk.github.io/tags/assembly/</link>
-    <description>Recent content in Assembly on 5h4rrk </description>
+    <title>Windows Shellcode on 5h4rrk </title>
+    <link>https://5h4rrk.github.io/tags/windows-shellcode/</link>
+    <description>Recent content in Windows Shellcode on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
     <lastBuildDate>Sun, 12 Jan 2025 16:22:44 +0530</lastBuildDate>
-    <atom:link href="https://5h4rrk.github.io/tags/assembly/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://5h4rrk.github.io/tags/windows-shellcode/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Windows Shellcode Development and Debugging with WinDbg - Part 1</title>
       <link>https://5h4rrk.github.io/posts/windows-shellcode/</link>

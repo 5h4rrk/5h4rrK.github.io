@@ -3,10 +3,43 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://5h4rrk.github.io/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/assembly/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
   </url><url>
     <loc>https://5h4rrk.github.io/tags/debugging/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/exploit-development/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/low-level/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/malware-analysis/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/posts/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/reverse-engineering/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/windbg/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/windows-internals/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/tags/windows-shellcode/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
+  </url><url>
+    <loc>https://5h4rrk.github.io/posts/windows-shellcode/</loc>
+    <lastmod>2025-01-12T16:22:44+05:30</lastmod>
   </url><url>
     <loc>https://5h4rrk.github.io/posts/pe-parse-windbg2/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
@@ -18,21 +51,6 @@
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://5h4rrk.github.io/tags/portable-executable/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/posts/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/reverse-engineering/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windbg/</loc>
-    <lastmod>2025-01-12T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windows-internals/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://5h4rrk.github.io/posts/pe-parse-windbg/</loc>

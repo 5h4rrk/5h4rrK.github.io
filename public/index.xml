@@ -6,8 +6,15 @@
     <description>Recent content on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 12 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Jan 2025 16:22:44 +0530</lastBuildDate>
     <atom:link href="https://5h4rrk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Windows Shellcode Development and Debugging with WinDbg - Part 1</title>
+      <link>https://5h4rrk.github.io/posts/windows-shellcode/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/posts/windows-shellcode/</guid>
+      <description>A comprehensive guide to understanding and creating Windows shellcode from scratch for exploit development. This article includes practical insights into using WinDbg for effective debugging and analysis.</description>
+    </item>
     <item>
       <title>Decoding PE Files: A Step-by-Step Guide with WinDbg - Part 2</title>
       <link>https://5h4rrk.github.io/posts/pe-parse-windbg2/</link>

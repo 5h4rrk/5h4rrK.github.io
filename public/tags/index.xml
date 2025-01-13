@@ -6,13 +6,69 @@
     <description>Recent content in Tags on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 12 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Jan 2025 16:22:44 +0530</lastBuildDate>
     <atom:link href="https://5h4rrk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Assembly</title>
+      <link>https://5h4rrk.github.io/tags/assembly/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/assembly/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Debugging</title>
       <link>https://5h4rrk.github.io/tags/debugging/</link>
-      <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
       <guid>https://5h4rrk.github.io/tags/debugging/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Exploit Development</title>
+      <link>https://5h4rrk.github.io/tags/exploit-development/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/exploit-development/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Low-Level</title>
+      <link>https://5h4rrk.github.io/tags/low-level/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/low-level/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Malware Analysis</title>
+      <link>https://5h4rrk.github.io/tags/malware-analysis/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/malware-analysis/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Reverse Engineering</title>
+      <link>https://5h4rrk.github.io/tags/reverse-engineering/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/reverse-engineering/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>WinDbg</title>
+      <link>https://5h4rrk.github.io/tags/windbg/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/windbg/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows Internals</title>
+      <link>https://5h4rrk.github.io/tags/windows-internals/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/windows-internals/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Windows Shellcode</title>
+      <link>https://5h4rrk.github.io/tags/windows-shellcode/</link>
+      <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/tags/windows-shellcode/</guid>
       <description></description>
     </item>
     <item>
@@ -34,27 +90,6 @@
       <link>https://5h4rrk.github.io/tags/portable-executable/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
       <guid>https://5h4rrk.github.io/tags/portable-executable/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Reverse Engineering</title>
-      <link>https://5h4rrk.github.io/tags/reverse-engineering/</link>
-      <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/tags/reverse-engineering/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>WinDbg</title>
-      <link>https://5h4rrk.github.io/tags/windbg/</link>
-      <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/tags/windbg/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Windows Internals</title>
-      <link>https://5h4rrk.github.io/tags/windows-internals/</link>
-      <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/tags/windows-internals/</guid>
       <description></description>
     </item>
     <item>
