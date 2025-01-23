@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>CTF on 5h4rrk </title>
-    <link>https://5h4rrk.github.io/tags/ctf/</link>
+    <link>http://localhost:1313/tags/ctf/</link>
     <description>Recent content in CTF on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <atom:link href="https://5h4rrk.github.io/tags/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/ctf/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Network-KeyLogger</title>
-      <link>https://5h4rrk.github.io/posts/keyboard-pcap/</link>
+      <link>http://localhost:1313/posts/keyboard-pcap/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/posts/keyboard-pcap/</guid>
+      <guid>http://localhost:1313/posts/keyboard-pcap/</guid>
       <description>how to decode the keystrokes from the pcap</description>
     </item>
   </channel>

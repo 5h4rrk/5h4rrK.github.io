@@ -2,17 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Categories on 5h4rrk </title>
-    <link>https://5h4rrk.github.io/categories/</link>
+    <link>http://localhost:1313/categories/</link>
     <description>Recent content in Categories on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 08 Mar 2024 07:51:58 +0000</lastBuildDate>
-    <atom:link href="https://5h4rrk.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 11 Jan 2025 17:00:50 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debugging</title>
+      <link>http://localhost:1313/categories/debugging/</link>
+      <pubDate>Sat, 11 Jan 2025 17:00:50 +0000</pubDate>
+      <guid>http://localhost:1313/categories/debugging/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Forensics</title>
-      <link>https://5h4rrk.github.io/categories/forensics/</link>
+      <link>http://localhost:1313/categories/forensics/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/categories/forensics/</guid>
+      <guid>http://localhost:1313/categories/forensics/</guid>
       <description></description>
     </item>
   </channel>

@@ -1,5 +1,5 @@
 +++
-title = 'Windows Shellcode Development and Debugging with WinDbg - Part 1'
+title = 'Windows Shellcode Development & Debugging with WinDbg: A Hands-On Guide (Part 1)'
 date = 2025-01-12T16:22:44+05:30
 draft = false
 tags = ['Windows Shellcode', 'Malware Analysis', 'Exploit Development', 'Assembly', 'WinDbg', 'Reverse Engineering', 'Debugging',  'Low-Level', 'Windows Internals']
