@@ -1,7 +1,7 @@
 +++
 title = 'Windows Shellcode Development & Debugging with WinDbg: A Hands-On Guide (Part 2)'
 date = 2025-01-21T07:05:40+05:30
-draft = true
+draft = false
 tags = ['Windows Shellcode', 'Malware Analysis', 'Exploit Development', 'Assembly', 'WinDbg', 'Reverse Engineering', 'Debugging',  'Low-Level', 'Windows Internals']
 summary = 'A comprehensive guide to understanding and creating Windows shellcode from scratch for exploit development. This article includes practical insights into using WinDbg for effective debugging and analysis.'
 +++
