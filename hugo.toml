@@ -1,7 +1,7 @@
 baseURL = "https://5h4rrk.github.io/"
 languageCode = "en-us"
 title = "5h4rrk "
-theme = "hugo-PaperMod"
+theme = "hugo-PaperMod-Catpuccin"
 enableInlineShortcodes = true
 enableRobotsTXT = true
 buildDrafts = false
@@ -9,7 +9,7 @@ buildFuture = false
 buildExpired = false
 enableEmoji = true
 pygmentsUseClasses = true
-mainsections = [ "posts", "hugo-PaperMod" ]
+mainsections = [ "posts", "hugo-PaperMod-Catpuccin" ]
 
 [minify]
 disableXML = true
