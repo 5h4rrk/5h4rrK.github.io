@@ -36,8 +36,8 @@ weight = 10
     title = "5h4rrk"
     imageUrl = "https://avatars.githubusercontent.com/u/89577007"
     imageTitle = "Profile image"
-    imageWidth = 120
-    imageHeight = 120
+    imageWidth = 130
+    imageHeight = 130
     subtitle = " ~/"
 
       [[languages.en.params.profileMode.buttons]]
