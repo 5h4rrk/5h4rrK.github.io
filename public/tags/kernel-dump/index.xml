@@ -2,17 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Kernel Dump on 5h4rrk </title>
-    <link>http://localhost:1313/tags/kernel-dump/</link>
+    <link>https://5h4rrk.github.io/tags/kernel-dump/</link>
     <description>Recent content in Kernel Dump on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
     <lastBuildDate>Thu, 30 Jan 2025 18:28:18 +0530</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/kernel-dump/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://5h4rrk.github.io/tags/kernel-dump/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Kernel Memory Dump Analysis : Introduction</title>
-      <link>http://localhost:1313/posts/dumpanalysis/dumpanalysis/</link>
+      <link>https://5h4rrk.github.io/posts/dumpanalysis/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/posts/dumpanalysis/dumpanalysis/</guid>
+      <guid>https://5h4rrk.github.io/posts/dumpanalysis/</guid>
+      <description>An introduction to analyzing kernel memory dumps using WinDbg.</description>
+    </item>
+    <item>
+      <title>Kernel Memory Dump Analysis : Introduction</title>
+      <link>https://5h4rrk.github.io/posts/dumpanalysis/dumpanalysis/</link>
+      <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
+      <guid>https://5h4rrk.github.io/posts/dumpanalysis/dumpanalysis/</guid>
       <description>An introduction to analyzing kernel memory dumps using WinDbg.</description>
     </item>
   </channel>

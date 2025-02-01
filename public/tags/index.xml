@@ -2,206 +2,206 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Tags on 5h4rrk </title>
-    <link>http://localhost:1313/tags/</link>
+    <link>https://5h4rrk.github.io/tags/</link>
     <description>Recent content in Tags on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
     <lastBuildDate>Thu, 30 Jan 2025 18:28:18 +0530</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://5h4rrk.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Digital Forensics</title>
-      <link>http://localhost:1313/tags/digital-forensics/</link>
+      <link>https://5h4rrk.github.io/tags/digital-forensics/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/digital-forensics/</guid>
+      <guid>https://5h4rrk.github.io/tags/digital-forensics/</guid>
       <description></description>
     </item>
     <item>
       <title>Dump Analysis</title>
-      <link>http://localhost:1313/tags/dump-analysis/</link>
+      <link>https://5h4rrk.github.io/tags/dump-analysis/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/dump-analysis/</guid>
+      <guid>https://5h4rrk.github.io/tags/dump-analysis/</guid>
       <description></description>
     </item>
     <item>
       <title>Kernel Dump</title>
-      <link>http://localhost:1313/tags/kernel-dump/</link>
+      <link>https://5h4rrk.github.io/tags/kernel-dump/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/kernel-dump/</guid>
+      <guid>https://5h4rrk.github.io/tags/kernel-dump/</guid>
       <description></description>
     </item>
     <item>
       <title>Memory Forensics</title>
-      <link>http://localhost:1313/tags/memory-forensics/</link>
+      <link>https://5h4rrk.github.io/tags/memory-forensics/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/memory-forensics/</guid>
+      <guid>https://5h4rrk.github.io/tags/memory-forensics/</guid>
       <description></description>
     </item>
     <item>
       <title>WinDbg</title>
-      <link>http://localhost:1313/tags/windbg/</link>
+      <link>https://5h4rrk.github.io/tags/windbg/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/windbg/</guid>
+      <guid>https://5h4rrk.github.io/tags/windbg/</guid>
       <description></description>
     </item>
     <item>
       <title>Windows</title>
-      <link>http://localhost:1313/tags/windows/</link>
+      <link>https://5h4rrk.github.io/tags/windows/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/windows/</guid>
+      <guid>https://5h4rrk.github.io/tags/windows/</guid>
       <description></description>
     </item>
     <item>
       <title>Windows Troubleshooting</title>
-      <link>http://localhost:1313/tags/windows-troubleshooting/</link>
+      <link>https://5h4rrk.github.io/tags/windows-troubleshooting/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>http://localhost:1313/tags/windows-troubleshooting/</guid>
+      <guid>https://5h4rrk.github.io/tags/windows-troubleshooting/</guid>
       <description></description>
     </item>
     <item>
       <title>Assembly</title>
-      <link>http://localhost:1313/tags/assembly/</link>
+      <link>https://5h4rrk.github.io/tags/assembly/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/assembly/</guid>
+      <guid>https://5h4rrk.github.io/tags/assembly/</guid>
       <description></description>
     </item>
     <item>
       <title>Debugging</title>
-      <link>http://localhost:1313/tags/debugging/</link>
+      <link>https://5h4rrk.github.io/tags/debugging/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/debugging/</guid>
+      <guid>https://5h4rrk.github.io/tags/debugging/</guid>
       <description></description>
     </item>
     <item>
       <title>Exploit Development</title>
-      <link>http://localhost:1313/tags/exploit-development/</link>
+      <link>https://5h4rrk.github.io/tags/exploit-development/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/exploit-development/</guid>
+      <guid>https://5h4rrk.github.io/tags/exploit-development/</guid>
       <description></description>
     </item>
     <item>
       <title>Low-Level</title>
-      <link>http://localhost:1313/tags/low-level/</link>
+      <link>https://5h4rrk.github.io/tags/low-level/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/low-level/</guid>
+      <guid>https://5h4rrk.github.io/tags/low-level/</guid>
       <description></description>
     </item>
     <item>
       <title>Malware Analysis</title>
-      <link>http://localhost:1313/tags/malware-analysis/</link>
+      <link>https://5h4rrk.github.io/tags/malware-analysis/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/malware-analysis/</guid>
+      <guid>https://5h4rrk.github.io/tags/malware-analysis/</guid>
       <description></description>
     </item>
     <item>
       <title>Reverse Engineering</title>
-      <link>http://localhost:1313/tags/reverse-engineering/</link>
+      <link>https://5h4rrk.github.io/tags/reverse-engineering/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/reverse-engineering/</guid>
+      <guid>https://5h4rrk.github.io/tags/reverse-engineering/</guid>
       <description></description>
     </item>
     <item>
       <title>Windows Internals</title>
-      <link>http://localhost:1313/tags/windows-internals/</link>
+      <link>https://5h4rrk.github.io/tags/windows-internals/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/windows-internals/</guid>
+      <guid>https://5h4rrk.github.io/tags/windows-internals/</guid>
       <description></description>
     </item>
     <item>
       <title>Windows Shellcode</title>
-      <link>http://localhost:1313/tags/windows-shellcode/</link>
+      <link>https://5h4rrk.github.io/tags/windows-shellcode/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>http://localhost:1313/tags/windows-shellcode/</guid>
+      <guid>https://5h4rrk.github.io/tags/windows-shellcode/</guid>
       <description></description>
     </item>
     <item>
       <title>PE</title>
-      <link>http://localhost:1313/tags/pe/</link>
+      <link>https://5h4rrk.github.io/tags/pe/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/pe/</guid>
+      <guid>https://5h4rrk.github.io/tags/pe/</guid>
       <description></description>
     </item>
     <item>
       <title>PE Parsing</title>
-      <link>http://localhost:1313/tags/pe-parsing/</link>
+      <link>https://5h4rrk.github.io/tags/pe-parsing/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/pe-parsing/</guid>
+      <guid>https://5h4rrk.github.io/tags/pe-parsing/</guid>
       <description></description>
     </item>
     <item>
       <title>Portable Executable</title>
-      <link>http://localhost:1313/tags/portable-executable/</link>
+      <link>https://5h4rrk.github.io/tags/portable-executable/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/portable-executable/</guid>
+      <guid>https://5h4rrk.github.io/tags/portable-executable/</guid>
       <description></description>
     </item>
     <item>
       <title>Bi0sCTF2024</title>
-      <link>http://localhost:1313/tags/bi0sctf2024/</link>
+      <link>https://5h4rrk.github.io/tags/bi0sctf2024/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/bi0sctf2024/</guid>
+      <guid>https://5h4rrk.github.io/tags/bi0sctf2024/</guid>
       <description></description>
     </item>
     <item>
       <title>File System Analysis</title>
-      <link>http://localhost:1313/tags/file-system-analysis/</link>
+      <link>https://5h4rrk.github.io/tags/file-system-analysis/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/file-system-analysis/</guid>
+      <guid>https://5h4rrk.github.io/tags/file-system-analysis/</guid>
       <description></description>
     </item>
     <item>
       <title>File System Forensics</title>
-      <link>http://localhost:1313/tags/file-system-forensics/</link>
+      <link>https://5h4rrk.github.io/tags/file-system-forensics/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/file-system-forensics/</guid>
+      <guid>https://5h4rrk.github.io/tags/file-system-forensics/</guid>
       <description></description>
     </item>
     <item>
       <title>Log Analysis</title>
-      <link>http://localhost:1313/tags/log-analysis/</link>
+      <link>https://5h4rrk.github.io/tags/log-analysis/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/log-analysis/</guid>
+      <guid>https://5h4rrk.github.io/tags/log-analysis/</guid>
       <description></description>
     </item>
     <item>
       <title>ReFS</title>
-      <link>http://localhost:1313/tags/refs/</link>
+      <link>https://5h4rrk.github.io/tags/refs/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/refs/</guid>
+      <guid>https://5h4rrk.github.io/tags/refs/</guid>
       <description></description>
     </item>
     <item>
       <title>Resilient File System</title>
-      <link>http://localhost:1313/tags/resilient-file-system/</link>
+      <link>https://5h4rrk.github.io/tags/resilient-file-system/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      <guid>http://localhost:1313/tags/resilient-file-system/</guid>
+      <guid>https://5h4rrk.github.io/tags/resilient-file-system/</guid>
       <description></description>
     </item>
     <item>
       <title>CTF</title>
-      <link>http://localhost:1313/tags/ctf/</link>
+      <link>https://5h4rrk.github.io/tags/ctf/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/ctf/</guid>
+      <guid>https://5h4rrk.github.io/tags/ctf/</guid>
       <description></description>
     </item>
     <item>
       <title>HID</title>
-      <link>http://localhost:1313/tags/hid/</link>
+      <link>https://5h4rrk.github.io/tags/hid/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/hid/</guid>
+      <guid>https://5h4rrk.github.io/tags/hid/</guid>
       <description></description>
     </item>
     <item>
       <title>Network Forensic</title>
-      <link>http://localhost:1313/tags/network-forensic/</link>
+      <link>https://5h4rrk.github.io/tags/network-forensic/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/network-forensic/</guid>
+      <guid>https://5h4rrk.github.io/tags/network-forensic/</guid>
       <description></description>
     </item>
     <item>
       <title>USB</title>
-      <link>http://localhost:1313/tags/usb/</link>
+      <link>https://5h4rrk.github.io/tags/usb/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/tags/usb/</guid>
+      <guid>https://5h4rrk.github.io/tags/usb/</guid>
       <description></description>
     </item>
   </channel>
