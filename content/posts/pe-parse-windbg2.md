@@ -1,5 +1,5 @@
 +++
-title = 'Decoding PE Files: A Step-by-Step Guide with WinDbg - Part 2'
+title = 'PE Parsing: A Step-by-Step Guide with WinDbg - Part 2'
 date = 2025-01-12
 tags = ['WinDbg', 'PE', "Portable Executable", "PE Parsing", 'Debugging', 'Reverse Engineering', 'Windows Internals']
 summary = 'Hands on parsing PE files with WinDbg and explore their structures for debugging and reverse engineering.'

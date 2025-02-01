@@ -9,7 +9,7 @@
     <lastBuildDate>Sun, 12 Jan 2025 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/pe-parsing/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Decoding PE Files: A Step-by-Step Guide with WinDbg - Part 2</title>
+      <title>PE Parsing: A Step-by-Step Guide with WinDbg - Part 2</title>
       <link>http://localhost:1313/posts/pe-parse-windbg2/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/posts/pe-parse-windbg2/</guid>
@@ -23,7 +23,7 @@
       <description>Hands-on parsing PE files with WinDbg and exploring their structures for debugging and reverse engineering.</description>
     </item>
     <item>
-      <title>Decoding PE Files: A Step-by-Step Guide with WinDbg - Part 1</title>
+      <title>PE Parsing: A Step-by-Step Guide with WinDbg - Part 1</title>
       <link>http://localhost:1313/posts/pe-parse-windbg/</link>
       <pubDate>Sat, 11 Jan 2025 17:00:50 +0530</pubDate>
       <guid>http://localhost:1313/posts/pe-parse-windbg/</guid>
