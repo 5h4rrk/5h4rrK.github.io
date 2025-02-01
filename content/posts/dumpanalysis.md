@@ -100,6 +100,7 @@ Local Machine Name QUACK (QUACK\heysa)
 
 Opening the DUMP file in Hex Editor [ImHex](https://github.com/WerWolv/ImHex) to analyze its contents. ImHex has collection of various pattern files that could be useful for understanding file structures and patterns.  
 
+
 ![alt text](image.png)
 
 
