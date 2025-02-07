@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Windows Syscall | 5h4rrk </title>
+<meta name="keywords" content="">
+<meta name="description" content="System Call in Windows - Native Function, GUI Function - Transition Ring 3 to Ring 0 - MSR - Swapping of TEB &amp; KPCR - KiSystemCall64, KiSystemCall64Shadow - KiSystemServiceUser - _ETHREAD Values populate - End Part of KiSystemServiceUser - Restore of Current Thread from _KTHREAD - KiSystemServiceStart() - Table Identifier , System Call Index - System Call Values Ranges for ntdll.dll and win32u.dll - KiSystemServiceRepeat() - Checks syscall GUI or Not - struct SERVICE_DESCRIPTOR_TABLE - struct SYSTEM_SERVICE_TABLE - Mention functionality of each member - nt!">
+<meta name="author" content="5h4rrk">
+<link rel="canonical" href="http://localhost:1313/posts/windows-syscall/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a870301ec77162a6de57a6d844871e66c162e0d2f989610116460652b149d700.css" integrity="sha256-qHAwHsdxYqbeV6bYRIceZsFi4NL5iWEBFkYGUrFJ1wA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/windows-syscall/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+  
+
+<meta property="og:url" content="http://localhost:1313/posts/windows-syscall/">
+  <meta property="og:site_name" content="5h4rrk ">
+  <meta property="og:title" content="Windows Syscall">
+  <meta property="og:description" content="System Call in Windows - Native Function, GUI Function - Transition Ring 3 to Ring 0 - MSR - Swapping of TEB &amp; KPCR - KiSystemCall64, KiSystemCall64Shadow - KiSystemServiceUser - _ETHREAD Values populate - End Part of KiSystemServiceUser - Restore of Current Thread from _KTHREAD - KiSystemServiceStart() - Table Identifier , System Call Index - System Call Values Ranges for ntdll.dll and win32u.dll - KiSystemServiceRepeat() - Checks syscall GUI or Not - struct SERVICE_DESCRIPTOR_TABLE - struct SYSTEM_SERVICE_TABLE - Mention functionality of each member - nt!">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-02-02T21:10:34+05:30">
+    <meta property="article:modified_time" content="2025-02-02T21:10:34+05:30">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Windows Syscall">
+<meta name="twitter:description" content="System Call in Windows - Native Function, GUI Function - Transition Ring 3 to Ring 0 - MSR - Swapping of TEB &amp; KPCR - KiSystemCall64, KiSystemCall64Shadow - KiSystemServiceUser - _ETHREAD Values populate - End Part of KiSystemServiceUser - Restore of Current Thread from _KTHREAD - KiSystemServiceStart() - Table Identifier , System Call Index - System Call Values Ranges for ntdll.dll and win32u.dll - KiSystemServiceRepeat() - Checks syscall GUI or Not - struct SERVICE_DESCRIPTOR_TABLE - struct SYSTEM_SERVICE_TABLE - Mention functionality of each member - nt!">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "http://localhost:1313/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Windows Syscall",
+      "item": "http://localhost:1313/posts/windows-syscall/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Windows Syscall",
+  "name": "Windows Syscall",
+  "description": "System Call in Windows - Native Function, GUI Function - Transition Ring 3 to Ring 0 - MSR - Swapping of TEB \u0026amp; KPCR - KiSystemCall64, KiSystemCall64Shadow - KiSystemServiceUser - _ETHREAD Values populate - End Part of KiSystemServiceUser - Restore of Current Thread from _KTHREAD - KiSystemServiceStart() - Table Identifier , System Call Index - System Call Values Ranges for ntdll.dll and win32u.dll - KiSystemServiceRepeat() - Checks syscall GUI or Not - struct SERVICE_DESCRIPTOR_TABLE - struct SYSTEM_SERVICE_TABLE - Mention functionality of each member - nt!",
+  "keywords": [
+    
+  ],
+  "articleBody": "System Call in Windows - Native Function, GUI Function - Transition Ring 3 to Ring 0 - MSR - Swapping of TEB \u0026 KPCR - KiSystemCall64, KiSystemCall64Shadow - KiSystemServiceUser - _ETHREAD Values populate - End Part of KiSystemServiceUser - Restore of Current Thread from _KTHREAD - KiSystemServiceStart() - Table Identifier , System Call Index - System Call Values Ranges for ntdll.dll and win32u.dll - KiSystemServiceRepeat() - Checks syscall GUI or Not - struct SERVICE_DESCRIPTOR_TABLE - struct SYSTEM_SERVICE_TABLE - Mention functionality of each member - nt!KeServiceDescriptorTable, nt!KeServiceDescriptorTableShadow - Checking of GUIThread in _ETHREAD [ IDA View ] - KeServiceDescriptorTable() - struct SYSTEM_SERVICE_TABLE - if (exceeds) // Table Index Checks, Exceeds for GUI only - KiConvertGuiThread() -\u003e Sets GuiThread - KiSystemServiceRepeat(); - If GuiThread If RestrictedGuiThread - r10 = KeServiceDescriptorTableFilter() // Sycall would me through this else - KeServiceDescriptorTableShadow() // Syscall - else - KeServiceDescriptorTable() - Resolving of ServiceDescriptorTable - Retriveing of Stack Parameter counts - Getting RVA of function - Kernel Routine Table has entries DWORD. - So multiply RVA by 4 and add it with ServiceTable address - Reach the actual code. - Filter Tables - SecurityMitigation - Sycall routed through Filter Table does not directly redirects to function - has imp_NtCrXXXXX (stub) Syscall\nIt invokes system caller at ring at privilege level 0. Loads RIP from IA32_LSTAR MSR. Before populating RIP, it moves the current executing instruction to RCX at Ring 3. WRMSR ensures that the IA32_LSTAR MSR always contains canonical address. Syscall also saves RFLAGS into R11, them masks RFLAGS with IA32_FMASK MSR (c00000084) Reset all bits except the bit IA32_FMASK in RFLAGS. loads CS and SS selectors from [ 47:32 ] of the IA32_STAR MSR. These segments are indices to Global Descriptor Table (GDT) or Local Descriptor Table (LDT) CS.Selector = IA32_STAR[ 47:32 ] SS.Selector = IA32_STAR[ 47:32 ] + 8 RSP is still not saved. Syscall instruction doesn’t save current stack pointer RSP. Application/Software responsibility is to save the previous RSP. OS system-call handler save the stack pointer before calling syscall and resotre before sysret. Ring 3\nGS Segment : TEB (x64 bit) FS Segment : TEB (x32 bit) Ring 0\nGS Segment : KPCR (x64 bit)\nFS Segment : KPCR (x32 bit)\nThese segements should be swapped before transitition to Kernel mode.\nIf stack shadowding is enabled \u0026 current privilege level equals to syscall, then shadow stack address is saved at IA32_PL3_SSP\nOverview of Sycall\nRCX := RIP; (* RCX will contain the address of the next instruction *) RIP := IA32_LSTAR; (* Set RIP to the syscall target address *) R11 := RFLAGS; (* Save current RFLAGS into R11 *) RFLAGS := RFLAGS AND NOT(IA32_FMASK); (* Mask out bits specified by IA32_FMASK *) CS.Selector := IA32_STAR[47:32] AND FFFCH; (* Operating system provides CS; RPL forced to 0 *) (* Set rest of CS to fixed values *) CS.Base := 0; (* Flat segment *) CS.Limit := FFFFFH; (* 4-KByte granularity, implies a 4-GByte limit *) CS.Type := 11; (* Execute/read code, accessed *) CS.S := 1; CS.DPL := 0; CS.P := 1; CS.L := 1; (* Entry is to 64-bit mode *) CS.D := 0; (* Required if CS.L = 1 *) CS.G := 1; (* 4-KByte granularity *) IF ShadowStackEnabled(CPL) THEN (* Adjust so bits 63:N get the value of bit N-1, where N is the CPU’s maximum linear-address width *) IA32_PL3_SSP := LA_adjust(SSP); (* Preserve IA32_PL3_SSP for Ring 3 to Ring 0 system calls *) FI; CPL := 0; (* Change to privilege level 0 *) IF ShadowStackEnabled(CPL) SSP := 0; (* Clear Shadow Stack Pointer in Ring 0 *) FI; SS.Selector := IA32_STAR[47:32] + 8; (* SS just above CS *) (* Set rest of SS to fixed values *) SS.Base := 0; (* Flat segment *) SS.Limit := FFFFFH; (* 4-KByte granularity, implies a 4-GByte limit *) SS.Type := 3; (* Read/write data, accessed *) SS.S := 1; SS.DPL := 0; SS.P := 1; SS.B := 1; (* 32-bit stack segment *) SS.G := 1; (* 4-KByte granularity *) Set a BreakPoint in NtAllocVirtualMemory\n6: kd\u003e bp nt!NtAllocateVirtualMemory 6: kd\u003e bl 0 e Disable Clear fffff807`0e699390 0001 (0001) nt!NtAllocateVirtualMemory 6: kd\u003e g Breakpoint 0 hit nt!NtAllocateVirtualMemory: fffff807`0e699390 488bc4 mov rax,rsp 5: kd\u003e !thread THREAD ffff878ff0503500 Cid 1f64.1fa0 Teb: 0000000004aa7000 Win32Thread: ffff878ff0f14b20 RUNNING on processor 5 Not impersonating DeviceMap ffffb40ac8a36b40 Owning Process ffff878fefe6b080 Image: mscorsvw.exe Attached Process N/A Image: N/A Wait Start TickCount 23487 Ticks: 14 (0:00:00:00.218) Context Switch Count 551 IdealProcessor: 5 UserTime 00:00:03.015 KernelTime 00:00:00.281 Win32 Start Address 0x0000000000345180 Stack Init ffffdb83fc23f650 Current ffffdb83fc23e680 Base ffffdb83fc240000 Limit ffffdb83fc239000 Call 0000000000000000 Priority 6 BasePriority 6 IoPriority 2 PagePriority 2 Child-SP RetAddr : Args to Child : Call Site ffffdb83`fc23f448 fffff807`0e42b4f5 : 00000000`00000000 00000000`00000000 00000000`00000000 00000000`0492df98 : nt!NtAllocateVirtualMemory ffffdb83`fc23f450 00007ff8`d39cd364 : 00007ff8`d199d6d9 00000000`04cfdee8 00000000`04cfdeec 00000000`00003000 : nt!KiSystemServiceCopyEnd+0x25 (TrapFrame @ ffffdb83`fc23f4c0) 00000000`0492df78 00007ff8`d199d6d9 : 00000000`04cfdee8 00000000`04cfdeec 00000000`00003000 00000000`0492dff0 : 0x00007ff8`d39cd364 00000000`0492df80 00000000`04cfdee8 : 00000000`04cfdeec 00000000`00003000 00000000`0492dff0 00000000`00003000 : 0x00007ff8`d199d6d9 00000000`0492df88 00000000`04cfdeec : 00000000`00003000 00000000`0492dff0 00000000`00003000 00000000`00000004 : 0x4cfdee8 00000000`0492df90 00000000`00003000 : 00000000`0492dff0 00000000`00003000 00000000`00000004 00000000`00000000 : 0x4cfdeec 00000000`0492df98 00000000`0492dff0 : 00000000`00003000 00000000`00000004 00000000`00000000 00000000`04aa9000 : 0x3000 00000000`0492dfa0 00000000`00003000 : 00000000`00000004 00000000`00000000 00000000`04aa9000 00000000`00000004 : 0x492dff0 00000000`0492dfa8 00000000`00000004 : 00000000`00000000 00000000`04aa9000 00000000`00000004 ffffffff`00003000 : 0x3000 00000000`0492dfb0 00000000`00000000 : 00000000`04aa9000 00000000`00000004 ffffffff`00003000 00000000`fffeffff : 0x4 Read the MSR\nMSR c0000101 : points to GS base MSR c0000102 : points to Kernel GS 5: kd\u003e rdmsr c0000101 msr[c0000101] = ffffc900`5f90a000 5: kd\u003e rdmsr c0000102 msr[c0000102] = 00000000`04aa7000 Wait a minute !. The address looks different here c0000101 points to kernel space while c0000102 points to user space It’s because the swapgs already executed here. Set a breakpoint at msr c0000082. 0: kd\u003e rdmsr c0000082 msr[c0000082] = fffff807`0ea35180 0: kd\u003e u fffff807`0ea35180 nt!KiSystemCall64Shadow: fffff807`0ea35180 0f01f8 swapgs -\u003e Ring 3 GS and Ring 0 GS exchanged ! fffff807`0ea35183 654889242510900000 mov qword ptr gs:[9010h],rsp -\u003e _KPCR._KPRCB.UserRspShadow fffff807`0ea3518c 65488b242500900000 mov rsp,qword ptr gs:[9000h] -\u003e _KPCR._KPRCB.KernelDirectoryTableBase fffff807`0ea35195 650fba24251890000001 bt dword ptr gs:[9018h],1 -\u003e _KPCR._KPRCB.ShadowFlags \u0026 1 fffff807`0ea3519f 7203 jb nt!KiSystemCall64Shadow+0x24 (fffff807`0ea351a4) fffff807`0ea351a1 0f22dc mov cr3,rsp fffff807`0ea351a4 65488b242508900000 mov rsp,qword ptr gs:[9008h] fffff807`0ea351ad 6a2b push 2Bh Similarly,\n2: kd\u003e u nt!KiSystemCall64 nt!KiSystemCall64: fffff806`45216000 0f01f8 swapgs -\u003e Ring 3 GS and Ring 0 GS exchanged ! fffff806`45216003 654889242510000000 mov qword ptr gs:[10h],rsp -\u003e _KPCR.UserRsp fffff806`4521600c 65488b2425a8010000 mov rsp,qword ptr gs:[1A8h] -\u003e _KPCR._KPRCB.RspBase fffff806`45216015 6a2b push 2Bh fffff806`45216017 65ff342510000000 push qword ptr gs:[10h] -\u003e _KPCR.Ntlib.StackLimit , _KPCR.UserRsp -\u003e both will have same value fffff806`4521601f 4153 push r11 fffff806`45216021 6a33 push 33h fffff806`45216023 51 push rcx Native Function \u0026 GUI Function\nNative Function APIs call ntdll.dll, which routes the request to kernel mode where the syscall is made from ntdll.dll. GUI function APIs call the corresponding GUI-related DLL (e.g., user32.dll), which routes the request to kernel mode, but the syscall is made from win32u.dll. [Image - NormalFunctionCall] [Image - GuiFunctionCall]\nKiSystemServiceUser\n0: kd\u003e u nt!KiSystemServiceUser nt!KiSystemServiceUser: fffff807`1e42723a c645ab02 mov byte ptr [rbp-55h],2 fffff807`1e42723e 65488b1c2588010000 mov rbx,qword ptr gs:[188h] ; _KPCR._KPRCB.CurrentThread fffff807`1e427247 0f0d8b90000000 prefetchw [rbx+90h] ; _KTHREAD.TrapFrame fffff807`1e42724e 0fae5dac stmxcsr dword ptr [rbp-54h] fffff807`1e427252 650fae142580010000 ldmxcsr dword ptr gs:[180h] ; _KPCR._KPRCB fffff807`1e42725b 807b0300 cmp byte ptr [rbx+3],0 ; _KTHREAD.TimerMiscFlags fffff807`1e42725f 66c785800000000000 mov word ptr [rbp+80h],0 fffff807`1e427268 0f84d0000000 je nt!KiSystemServiceUser+0x104 (fffff807`1e42733e) fffff807`1e42726e f6430303 test byte ptr [rbx+3],3 ; _KTHREAD.TimerMiscFlags fffff807`1e427272 4c8945c8 mov qword ptr [rbp-38h],r8 fffff807`1e427276 4c894dd0 mov qword ptr [rbp-30h],r9 fffff807`1e42727a 7405 je nt!KiSystemServiceUser+0x47 (fffff807`1e427281) fffff807`1e42727c e86fcffeff call nt!KiSaveDebugRegisterState (fffff807`1e4141f0) fffff807`1e427281 f6430324 test byte ptr [rbx+3],24h ; _KTHREAD.TimerMiscFlags.IndexBits ...... ..... fffff807`1e4272e3 b9020100c0 mov ecx,0C0000102h fffff807`1e4272e8 0f32 rdmsr ; Lower 32-bit in EAX \u0026 upper 32-bit in EDX fffff807`1e4272ea 48c1e220 shl rdx,20h fffff807`1e4272ee 480bc2 or rax,rdx ; RAX = _KPCR fffff807`1e4272f1 483b05e022c1ff cmp rax,qword ptr [nt!MmUserProbeAddress (fffff807`1e0395d8)] ; Defines the highest boundary, distinguish User Mode \u0026 Kernel Mode fffff807`1e4272f8 480f4305d822c1ff cmovae rax,qword ptr [nt!MmUserProbeAddress (fffff807`1e0395d8)] fffff807`1e427300 483983f0000000 cmp qword ptr [rbx+0F0h],rax ; _KTHREAD.Teb fffff807`1e427307 7422 je nt!KiSystemServiceUser+0xf1 (fffff807`1e42732b) fffff807`1e427309 488b93f0010000 mov rdx,qword ptr [rbx+1F0h] ; _KTHREAD.Ucb fffff807`1e427310 0fba6b7408 bts dword ptr [rbx+74h],8 ; _KTRHEAD.MiscFlags fffff807`1e427315 66ff8be6010000 dec word ptr [rbx+1E6h] ; fffff807`1e42731c 48898280000000 mov qword ptr [rdx+80h],rax fffff807`1e427323 fb sti fffff807`1e427324 e817190000 call nt!KiUmsCallEntry (fffff807`1e428c40) fffff807`1e427329 eb0b jmp nt!KiSystemServiceUser+0xfc (fffff807`1e427336) fffff807`1e42732b f6430340 test byte ptr [rbx+3],40h fffff807`1e42732f 7405 je nt!KiSystemServiceUser+0xfc (fffff807`1e427336) fffff807`1e427331 0fba6b7410 bts dword ptr [rbx+74h],10h ; _KTRHEAD.MiscFlags fffff807`1e427336 4c8b45c8 mov r8,qword ptr [rbp-38h] fffff807`1e42733a 4c8b4dd0 mov r9,qword ptr [rbp-30h] fffff807`1e42733e 488b45b0 mov rax,qword ptr [rbp-50h] fffff807`1e427342 488b4db8 mov rcx,qword ptr [rbp-48h] fffff807`1e427346 488b55c0 mov rdx,qword ptr [rbp-40h] fffff807`1e42734a fb sti fffff807`1e42734b 48898b88000000 mov qword ptr [rbx+88h],rcx ; _KTHREAD.FirstArgument fffff807`1e427352 898380000000 mov dword ptr [rbx+80h],eax ; _KTHREAD.SystemCallNumber fffff807`1e427358 0f1f840000000000 nop dword ptr [rax+rax] InfoSummary\nrcx : FirstArgument eax : SystemCallNumber KiSystemServiceStart\n0: kd\u003e u nt!KiSystemServiceStart nt!KiSystemServiceStart: fffff807`1e427360 4889a390000000 mov qword ptr [rbx+90h],rsp fffff807`1e427367 8bf8 mov edi,eax ; edi = SystemCallNumber fffff807`1e427369 c1ef07 shr edi,7 ; edi = edi \u003e\u003e 7 fffff807`1e42736c 83e720 and edi,20h ; edi = edi \u0026 0x20 --\u003e Table Identifier fffff807`1e42736f 25ff0f0000 and eax,0FFFh ; eax = eax \u0026 0x0fff This function call is particularly used for info extraction. It extracts System call index and Table Identifier. Suppose SystemCall Value : 0xcf\nEDI : 0000000011001111 \u003e\u003e 7 ---------------- EDI : 0000000000000001 AND 0000000000100000 ---------------- 0000000000000000 EAX : 0000000011001111 AND 0000111111111111 ---------------- 0000000011001111 There are two distinct table identifiers: 0x00 and 0x01.Windows 10 \u0026 11 has 0x20 not 0x01. As mentioned earlier, Win API which calls sycall through ntdll.dll and has sycall ranges from 0x0 - 0x0fff. For GUI, the syscall ranges from 1000 - 0x1fff and made throuhg win32u.dll KiSystemServiceRepeat\nThis is the most interesting part and is main part of the syscall. nt!KiSystemServiceRepeat: fffff807`1e427374 4c8d1545259f00 lea r10,[nt!KeServiceDescriptorTable (fffff807`1ee198c0)] fffff807`1e42737b 4c8d1dbed68e00 lea r11,[nt!KeServiceDescriptorTableShadow (fffff807`1ed14a40)] fffff807`1e427382 f7437880000000 test dword ptr [rbx+78h],80h ; _KTHREAD-\u003eThreadFlags ; Sets ThreadFlgas.GuiThread bit == 1 fffff807`1e427389 7413 je nt!KiSystemServiceRepeat+0x2a (fffff807`1e42739e) fffff807`1e42738b f7437800002000 test dword ptr [rbx+78h],200000h ; _ETHREAD-\u003eThreadFlags.RestrictedGuiThread == 1 fffff807`1e427392 7407 je nt!KiSystemServiceRepeat+0x27 (fffff807`1e42739b) fffff807`1e427394 4c8d1d65d88e00 lea r11,[nt!KeServiceDescriptorTableFilter (fffff807`1ed14c00)] fffff807`1e42739b 4d8bd3 mov r10,r11 fffff807`1e42739e 413b443a10 cmp eax,dword ptr [r10+rdi+10h] \u003c------- jmp here if GuiThread == 0 fffff807`1e4273a3 0f8398070000 jae nt!KiSystemServiceExitPico+0x296 (fffff807`1e427b41) fffff807`1e4273a9 4d8b143a mov r10,qword ptr [r10+rdi] fffff807`1e4273ad 4d631c82 movsxd r11,dword ptr [r10+rax*4] fffff807`1e4273b1 498bc3 mov rax,r11 fffff807`1e4273b4 49c1fb04 sar r11,4 fffff807`1e4273b8 4d03d3 add r10,r11 fffff807`1e4273bb 83ff20 cmp edi,20h fffff807`1e4273be 7550 jne nt!KiSystemServiceGdiTebAccess+0x49 (fffff807`1e427410) fffff807`1e4273c0 4c8b9bf0000000 mov r11,qword ptr [rbx+0F0h] There are two Service Descriptor Table i.e. KeServiceDescriptorTable \u0026 KeServiceDescriptorTableShadow typedef struct tag_SERVICE_DESCRIPTOR_TABLE { SYSTEM_SERVICE_TABLE item1; // ntoskrnl SYSTEM_SERVICE_TABLE item2; // win32k SYSTEM_SERVICE_TABLE item3; SYSTEM_SERVICE_TABLE item4; } SERVICE_DESCRIPTOR_TABLE; typedef struct tag_SYSTEM_SERVICE_TABLE { PULONG ServiceTable; PULONG_PTR CounterTable; ULONG_PTR ServiceLimit; PBYTE ArgumentTable; } SYSTEM_SERVICE_TABLE; SERVICE_DESCRIPTOR_TABLE has 4 members item1, item2, item3, item4 each of type SYSTEM_SERVICE_TABLE which has further 4 members i.e ServiceTable, CounterTable, ServiceLimit \u0026 ArgumentTable Note\nr10 : KeServiceDescriptorTable r11 : KeServiceDescriptorTableShadow rdi : Table Idenitifier rax : SystemCall Value rbx : _KTHREAD test dword ptr [rbx+78h],80h 0: kd\u003e dt nt!_KTHREAD -y GuiThread +0x078 GuiThread : Pos 7, 1 Bit checks GUIThread Bit is set or unset. It is unset for the first time no matter whether its a GUI function or Native Function. It would be set to 1 later on. Based on the function type, the table identifier would be choosen. test dword ptr [rbx+78h],200000h If this bit is set, then it jumps to nt!KiSystemServiceRepeat+0x27\nnt!KiSystemServiceRepeat+0x27: fffff807`1e42739b 4d8bd3 mov r10,r11 \u003c--- moves KeServiceDescriptorTableShadow to r10 fffff807`1e42739e 413b443a10 cmp eax,dword ptr [r10+rdi+10h] fffff807`1e4273a3 0f8398070000 jae nt!KiSystemServiceExitPico+0x296 (fffff807`1e427b41) fffff807`1e4273a9 4d8b143a mov r10,qword ptr [r10+rdi] fffff807`1e4273ad 4d631c82 movsxd r11,dword ptr [r10+rax*4] fffff807`1e4273b1 498bc3 mov rax,r11 fffff807`1e4273b4 49c1fb04 sar r11,4 fffff807`1e4273b8 4d03d3 add r10,r11 In general,\nif (_KTHREAD-\u003eThreadFlags.GuiThread == 0 ){ r11 = KeServiceDescriptorTable r10 = r11; } else { if (_ETHREAD-\u003eThreadFlags.RestrictedGuiThread == 1){ r10 = KeServiceDescriptorTableFilter; r11 = r10; } else { r10 = KeServiceDescriptorTableShadow; r11 = r10; } } test dword ptr [rbx+78h],200000h If this RestrictedGuiThread is unset, then it jumps to nt!KiSystemServiceRepeat+0x27\nnt!KiSystemServiceRepeat+0x27: fffff807`1e42739e 413b443a10 cmp eax,dword ptr [r10+rdi+10h] \u003c------- jmp here if GuiThread == 0 fffff807`1e4273a3 0f8398070000 jae nt!KiSystemServiceExitPico+0x296 (fffff807`1e427b41) fffff807`1e4273a9 4d8b143a mov r10,qword ptr [r10+rdi] fffff807`1e4273ad 4d631c82 movsxd r11,dword ptr [r10+rax*4] fffff807`1e4273b1 498bc3 mov rax,r11 fffff807`1e4273b4 49c1fb04 sar r11,4 fffff807`1e4273b8 4d03d3 add r10,r11 fffff807`1e4273bb 83ff20 cmp edi,20h fffff807`1e4273be 7550 jne nt!KiSystemServiceGdiTebAccess+0x49 (fffff807`1e427410) fffff807`1e4273c0 4c8b9bf0000000 mov r11,qword ptr [rbx+0F0h] For the first time, it would be unset.\nNote r10 : KeServiceDescriptorTable rdi : Table Identifier 00 for Native, 20 for GUI Function\n0: kd\u003e dqs nt!KeServiceDescriptorTable fffff807`1ee198c0 fffff807`1e0df9f0 nt!KiServiceTable fffff807`1ee198c8 00000000`00000000 fffff807`1ee198d0 00000000`000001d8 fffff807`1ee198d8 fffff807`1e0e0154 nt!KiArgumentTable fffff807`1ee198e0 00000000`00000000 fffff807`1ee198e8 00000000`00000000 fffff807`1ee198f0 00000000`00000000 fffff807`1ee198f8 00000000`00000000 fffff807`1ee19900 fffff807`1ea2f2c0 nt!KiBreakpointTrapShadow fffff807`1ee19908 fffff807`1ea2f340 nt!KiOverflowTrapShadow fffff807`1ee19910 fffff807`1ea2fd40 nt!KiRaiseSecurityCheckFailureShadow fffff807`1ee19918 fffff807`1ea2fdc0 nt!KiRaiseAssertionShadow fffff807`1ee19920 fffff807`1ea2fe40 nt!KiDebugServiceTrapShadow fffff807`1ee19928 fffff807`1ea31180 nt!KiSystemCall64Shadow fffff807`1ee19930 fffff807`1ea30e40 nt!KiSystemCall32Shadow fffff807`1ee19938 00000000`00000000 0: kd\u003e ? nt!KeServiceDescriptorTable + 0x00 + 10 Evaluate expression: -8765510149936 = fffff807`1ee198d0 Service Table is an array of Relative Virtual Address which points to kernel routine. eax is check against ServiceTable in SYSTEM_SERVICE_TABLE If it’s native function, it will continue the execution.\nNtLoadDriver Index : 0x106\n0x106 \u003c 0x1d8 - It lies in the Table limit.\n[ r10 + rdi ] -\u003e [ nt!KeServiceDescriptorTable + 0x00 ] -\u003e [ fffff807`1ee198d0 ]\nr10 = fffff807`1e0df9f0 (nt!KiServiceTable)\nr11 = [ fffff807`1e0df9f0 + 0x04 * 0x106 ] = [ fffff8071e0dfe08 ]\n0: kd\u003e dd nt!KiServiceTable L1 fffff807`1e0dfe08 06b50300 0x06b50300 \u003e\u003e 4 = 0x6b5030 ; Preserve Sign Extension +------------------------------+-------------------+ | 0000000001101011010100000011 | 0000 | +------------------------------+-------------------+ RVA No of params passed through stack NtLoadDriver( _In_ PUNICODE_STRING DriverServiceName ); Only one parameter which is passed through rcx register. 0: kd\u003e ? nt!KiServiceTable + 0x6b5030 Evaluate expression: -8765516985824 = fffff807`1e794a20 0: kd\u003e u fffff807`1e794a20 nt!NtLoadDriver: fffff807`1e794a20 4883ec28 sub rsp,28h fffff807`1e794a24 e8dfcfc1ff call nt!IopLoadDriverImage (fffff807`1e3b1a08) fffff807`1e794a29 4883c428 add rsp,28h fffff807`1e794a2d c3 ret fffff807`1e794a2e cc int 3 fffff807`1e794a2f cc int 3 fffff807`1e794a30 cc int 3 fffff807`1e794a31 cc int 3 What if GUI Function ?\nSystem Call Index of UserPromotePointer is 0x493. fffff807`1e42739e 413b443a10 cmp eax,dword ptr [r10+rdi+10h] fffff807`1e4273a3 0f8398070000 jae nt!KiSystemServiceExitPico+0x296 (fffff807`1e427b41) For GUI function, the SystemTable is 0 and 0x493 \u003e 0x0. Undergoes multiple kernel mode checks \u0026 eventually calls the macro\ntypedef struct _PERFINFO_THREAD_INFORMATION { PVOID StackBase; PVOID StackLimit; PVOID UserStackBase; PVOID UserStackLimit; PVOID StartAddr; PVOID Win32StartAddr; ULONG ProcessId; ULONG ThreadId; char WaitMode; } PERFINFO_THREAD_INFORMATION; #define PERFINFO_CONVERT_TO_GUI_THREAD(EThread) \\ if (PERFINFO_IS_GROUP_ON(PERF_MEMORY)) { \\ PERFINFO_THREAD_INFORMATION _ThreadInfo; \\ _ThreadInfo.ProcessId = HandleToUlong((EThread)-\u003eCid.UniqueProcess); \\ _ThreadInfo.ThreadId = HandleToUlong((EThread)-\u003eCid.UniqueThread); \\ _ThreadInfo.StackBase = (EThread)-\u003eTcb.StackBase; \\ _ThreadInfo.StackLimit = (EThread)-\u003eTcb.StackLimit; \\ _ThreadInfo.UserStackBase = 0; \\ _ThreadInfo.UserStackLimit = 0; \\ _ThreadInfo.StartAddr = 0; \\ _ThreadInfo.Win32StartAddr = 0; \\ _ThreadInfo.WaitMode = -1; \\ PerfInfoLogBytes( \\ PERFINFO_LOG_TYPE_CONVERTTOGUITHREAD, \\ \u0026_ThreadInfo, \\ sizeof(_ThreadInfo) \\ ); \\ } It then sets Thread-\u003eTcb.ServiceTable = (PVOID)\u0026KeServiceDescriptorTableShadow[0] fffff807`1e427b59 e8720bffff call nt!KiConvertToGuiThread (fffff807`1e4186d0) fffff807`1e427b5e 0bc0 or eax,eax fffff807`1e427b60 8b4580 mov eax,dword ptr [rbp-80h] fffff807`1e427b63 488b4d88 mov rcx,qword ptr [rbp-78h] fffff807`1e427b67 488b5590 mov rdx,qword ptr [rbp-70h] fffff807`1e427b6b 4c8b4598 mov r8,qword ptr [rbp-68h] fffff807`1e427b6f 4c8b4da0 mov r9,qword ptr [rbp-60h] fffff807`1e427b73 4889a390000000 mov qword ptr [rbx+90h],rsp fffff807`1e427b7a 0f84f4f7ffff je nt!KiSystemServiceRepeat (fffff807`1e427374) On success of KiConvertToGuiThread, it jumps to KiSystemServiceRepeat. Note\nr10 : KeServiceDescriptorTableShadow rdi : Table Identifier\nFor Windows 10 and 11 : rdi = 0x20 Before Windows 10 : rdi = 0x01\nnt!KiSystemServiceRepeat+0x2a: fffff807`1e42739e 413b443a10 cmp eax,dword ptr [r10+rdi+10h] fffff807`1e4273a3 0f8398070000 jae nt!KiSystemServiceExitPico+0x296 (fffff807`1e427b41) fffff807`1e4273a9 4d8b143a mov r10,qword ptr [r10+rdi] fffff807`1e4273ad 4d631c82 movsxd r11,dword ptr [r10+rax*4] 0: kd\u003e dqs nt!KeServiceDescriptorTableShadow fffff807`1ed14a40 fffff807`1e0df9f0 nt!KiServiceTable fffff807`1ed14a48 00000000`00000000 fffff807`1ed14a50 00000000`000001d8 fffff807`1ed14a58 fffff807`1e0e0154 nt!KiArgumentTable fffff807`1ed14a60 ffffe905`bef79000 win32k!W32pServiceTable fffff807`1ed14a68 00000000`00000000 fffff807`1ed14a70 00000000`00000524 fffff807`1ed14a78 ffffe905`bef7a9bc win32k!W32pArgumentTable 0: kd\u003e ? nt!KeServiceDescriptorTableShadow + 0x20 + 0x10 Evaluate expression: -8765511218576 = fffff807`1ed14a70 System Call Index of UserPromotePointer is 0x493.\neax = 0x524\n0x493 \u003c 0x524 It’s smaller so jump won’t be taken. fffff807`1e4273a9 4d8b143a mov r10,qword ptr [r10+rdi] fffff807`1e4273ad 4d631c82 movsxd r11,dword ptr [r10+rax*4] fffff807`1e4273b1 498bc3 mov rax,r11 fffff807`1e4273b4 49c1fb04 sar r11,4 fffff807`1e4273b8 4d03d3 add r10,r11 fffff807`1e4273bb 83ff20 cmp edi,20h fffff807`1e4273be 7550 jne nt!KiSystemServiceGdiTebAccess+0x49 (fffff807`1e427410) fffff807`1e4273c0 4c8b9bf0000000 mov r11,qword ptr [rbx+0F0h] r10 : W32pServiceTable = ffffe905`bef79000 rax : System Call Index Value = 0x493 0: kd\u003e ? win32k!W32pServiceTable + (0x493 * 0x4) Evaluate expression: -25264088702388 = ffffe905`bef7a24c 0: kd\u003e dd ffff8252`8ba7a24c L1 ffff8252`8ba7a24c ff8e3080 +----------------------------------+------------+ | 11111111111110001110001100001000 | 0000 | +----------------------------------+------------+ RVA No of stack params 0xff8e3080 \u003e\u003e 4 : 0xfff8e308 = 0xffffffff0xfff8e308 ; Preserve Sign Extension 0: kd\u003e ? win32k!W32pServiceTable + 0xfffffffffff8e308 Evaluate expression: -138183935233272 = ffff8252`8ba07308 0: kd\u003e u ffff8252`8ba07308 win32k!NtUserPromotePointer: ffff8252`8ba07308 4883ec28 sub rsp,28h ffff8252`8ba0730c 488b050df10500 mov rax,qword ptr [win32k!ext_ms_win_core_win32k_fulluser_l1+0x860 (ffff8252`8ba66420)] ffff8252`8ba07313 4885c0 test rax,rax ffff8252`8ba07316 7406 je win32k!NtUserPromotePointer+0x16 (ffff8252`8ba0731e) ffff8252`8ba07318 ff1552e60600 call qword ptr [win32k!_guard_dispatch_icall_fptr (ffff8252`8ba75970)] ffff8252`8ba0731e 4883c428 add rsp,28h ffff8252`8ba07322 c3 ret 0: kd\u003e ? win32k!W32pServiceTableFilter + 4 * 0x493 Evaluate expression: -138183934754500 = ffff8252`8ba7c13c 0: kd\u003e dd ffff8252`8ba7c13c L1 ffff8252`8ba7c13c ffce9f00 0xffce9f00 \u003e\u003e 4 : 0xfffffffffffce9f0 ;Preserve Sign Extension 0: kd\u003e ? win32k!W32pServiceTableFilter + 0xfffffffffffce9f0 Evaluate expression: -138183934961440 = ffff8252`8ba498e0 0: kd\u003e u ffff8252`8ba498e0 win32k!stub_UserPromotePointer: \u003c---- Tablefilter points to stub [......] [......] External References\nhttps://googleprojectzero.blogspot.com/2016/11/breaking-chain.html https://www.matteomalvica.com/minutes/windows_kernel/ ",
+  "wordCount" : "2736",
+  "inLanguage": "en",
+  "datePublished": "2025-02-02T21:10:34+05:30",
+  "dateModified": "2025-02-02T21:10:34+05:30",
+  "author":{
+    "@type": "Person",
+    "name": "5h4rrk"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "http://localhost:1313/posts/windows-syscall/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "5h4rrk ",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "http://localhost:1313/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="5h4rrk  (Alt + H)">5h4rrk </a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="http://localhost:1313/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a>&nbsp;»&nbsp;<a href="http://localhost:1313/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Windows Syscall
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2025-02-02 21:10:34 +0530 IST'>February 2, 2025</span>&nbsp;·&nbsp;13 min&nbsp;·&nbsp;5h4rrk
+
+</div>
+  </header> <div class="toc">
+    <details >
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">Table of Contents</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#system-call-in-windows" aria-label="System Call in Windows">System Call in Windows</a>
+                </li>
+            </ul>
+        </div>
+    </details>
+</div>
+
+  <div class="post-content"><h2 id="system-call-in-windows">System Call in Windows<a hidden class="anchor" aria-hidden="true" href="#system-call-in-windows">#</a></h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="o">-</span> <span class="n">Native</span> <span class="n">Function</span><span class="p">,</span> <span class="n">GUI</span> <span class="n">Function</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">Transition</span> <span class="n">Ring</span> <span class="mi">3</span> <span class="n">to</span> <span class="n">Ring</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">MSR</span> 
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">Swapping</span> <span class="n">of</span> <span class="n">TEB</span> <span class="o">&amp;</span> <span class="n">KPCR</span> 
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">KiSystemCall64</span><span class="p">,</span> <span class="n">KiSystemCall64Shadow</span> 
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">KiSystemServiceUser</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">_ETHREAD</span> <span class="n">Values</span> <span class="n">populate</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">End</span> <span class="n">Part</span> <span class="n">of</span> <span class="n">KiSystemServiceUser</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Restore</span> <span class="n">of</span> <span class="n">Current</span> <span class="n">Thread</span> <span class="n">from</span> <span class="n">_KTHREAD</span> 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="nf">KiSystemServiceStart</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Table</span> <span class="n">Identifier</span> <span class="p">,</span> <span class="n">System</span> <span class="n">Call</span> <span class="n">Index</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">System</span> <span class="n">Call</span> <span class="n">Values</span> <span class="n">Ranges</span> <span class="k">for</span> <span class="n">ntdll</span><span class="p">.</span><span class="n">dll</span> <span class="n">and</span> <span class="n">win32u</span><span class="p">.</span><span class="n">dll</span> 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="nf">KiSystemServiceRepeat</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Checks</span> <span class="n">syscall</span> <span class="n">GUI</span> <span class="n">or</span> <span class="n">Not</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="k">struct</span> <span class="n">SERVICE_DESCRIPTOR_TABLE</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="k">struct</span> <span class="n">SYSTEM_SERVICE_TABLE</span> 
+</span></span><span class="line"><span class="cl">            <span class="o">-</span> <span class="n">Mention</span> <span class="n">functionality</span> <span class="n">of</span> <span class="n">each</span> <span class="n">member</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">nt</span><span class="o">!</span><span class="n">KeServiceDescriptorTable</span><span class="p">,</span> <span class="n">nt</span><span class="o">!</span><span class="n">KeServiceDescriptorTableShadow</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Checking</span> <span class="n">of</span> <span class="n">GUIThread</span> <span class="n">in</span> <span class="n">_ETHREAD</span> <span class="p">[</span> <span class="n">IDA</span> <span class="n">View</span> <span class="p">]</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="nf">KeServiceDescriptorTable</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="k">struct</span> <span class="n">SYSTEM_SERVICE_TABLE</span>                                      
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="k">if</span> <span class="p">(</span><span class="n">exceeds</span><span class="p">)</span> <span class="c1">// Table Index Checks, Exceeds for GUI only
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                <span class="o">-</span> <span class="nf">KiConvertGuiThread</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Sets</span> <span class="n">GuiThread</span>
+</span></span><span class="line"><span class="cl">                    <span class="o">-</span> <span class="nf">KiSystemServiceRepeat</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                            <span class="o">-</span> <span class="n">If</span> <span class="n">GuiThread</span>
+</span></span><span class="line"><span class="cl">                                    <span class="n">If</span> <span class="n">RestrictedGuiThread</span>
+</span></span><span class="line"><span class="cl">                                            <span class="o">-</span> <span class="n">r10</span> <span class="o">=</span> <span class="nf">KeServiceDescriptorTableFilter</span><span class="p">()</span> <span class="c1">// Sycall would me through this
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                                    <span class="k">else</span> 
+</span></span><span class="line"><span class="cl">                                            <span class="o">-</span> <span class="nf">KeServiceDescriptorTableShadow</span><span class="p">()</span>       <span class="c1">// Syscall 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="o">-</span> <span class="k">else</span> 
+</span></span><span class="line"><span class="cl">            <span class="o">-</span> <span class="nf">KeServiceDescriptorTable</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">Resolving</span> <span class="n">of</span> <span class="n">ServiceDescriptorTable</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Retriveing</span> <span class="n">of</span> <span class="n">Stack</span> <span class="n">Parameter</span> <span class="n">counts</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">Getting</span> <span class="n">RVA</span> <span class="n">of</span> <span class="n">function</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">Kernel</span> <span class="n">Routine</span> <span class="n">Table</span> <span class="n">has</span> <span class="n">entries</span> <span class="n">DWORD</span><span class="p">.</span> 
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">So</span> <span class="n">multiply</span> <span class="n">RVA</span> <span class="n">by</span> <span class="mi">4</span> <span class="n">and</span> <span class="n">add</span> <span class="n">it</span> <span class="n">with</span> <span class="n">ServiceTable</span> <span class="n">address</span> 
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">Reach</span> <span class="n">the</span> <span class="n">actual</span> <span class="n">code</span><span class="p">.</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="o">-</span> <span class="n">Filter</span> <span class="n">Tables</span> 
+</span></span><span class="line"><span class="cl">    <span class="o">-</span> <span class="n">SecurityMitigation</span>
+</span></span><span class="line"><span class="cl">        <span class="o">-</span> <span class="n">Sycall</span> <span class="n">routed</span> <span class="n">through</span> <span class="n">Filter</span> <span class="n">Table</span> <span class="n">does</span> <span class="n">not</span> <span class="n">directly</span> <span class="n">redirects</span> <span class="n">to</span> <span class="n">function</span>
+</span></span><span class="line"><span class="cl">            <span class="o">-</span> <span class="n">has</span> <span class="nf">imp_NtCrXXXXX</span>  <span class="p">(</span><span class="n">stub</span><span class="p">)</span>
+</span></span></code></pre></div><hr>
+<p><strong>Syscall</strong></p>
+<ul>
+<li>It invokes system caller at ring at privilege level 0.</li>
+<li>Loads RIP from <code>IA32_LSTAR</code> MSR.</li>
+<li>Before populating RIP, it moves the current executing instruction to <code>RCX</code> at Ring 3.</li>
+<li>WRMSR ensures that the IA32_LSTAR MSR always contains canonical address.</li>
+<li>Syscall also saves <code>RFLAGS</code> into R11, them masks RFLAGS with <code>IA32_FMASK</code> MSR (c00000084)</li>
+<li>Reset all bits except the bit <code>IA32_FMASK</code> in <code>RFLAGS</code>.</li>
+<li>loads CS and SS selectors from [ 47:32 ] of the <code>IA32_STAR</code> MSR. These segments are indices to Global Descriptor Table (GDT) or Local Descriptor Table (LDT)</li>
+<li>CS.Selector = IA32_STAR[ 47:32 ]</li>
+<li>SS.Selector = IA32_STAR[ 47:32 ] + 8</li>
+<li>RSP is still not saved. Syscall instruction doesn&rsquo;t save current stack pointer <code>RSP</code>.</li>
+<li>Application/Software responsibility is to save the previous <code>RSP</code>.</li>
+<li>OS system-call handler save the stack pointer before calling <code>syscall</code> and resotre before <code>sysret</code>.</li>
+</ul>
+<p>Ring 3</p>
+<ul>
+<li>GS Segment : TEB  (x64 bit)</li>
+<li>FS Segment : TEB  (x32 bit)</li>
+</ul>
+<p>Ring 0</p>
+<ul>
+<li>
+<p>GS Segment : KPCR (x64 bit)</p>
+</li>
+<li>
+<p>FS Segment : KPCR (x32 bit)</p>
+</li>
+<li>
+<p>These segements should be swapped before transitition to Kernel mode.</p>
+</li>
+<li>
+<p>If stack shadowding is enabled &amp; current privilege level equals to syscall, then shadow stack address is saved at <code>IA32_PL3_SSP</code></p>
+</li>
+</ul>
+<p><strong>Overview of Sycall</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="no">RCX</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">RIP</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="no">RCX</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">contain</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">next</span><span class="w"> </span><span class="n">instruction</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">RIP</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">IA32_LSTAR</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Set</span><span class="w"> </span><span class="no">RIP</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">syscall</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="n">address</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">R11</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">RFLAGS</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Save</span><span class="w"> </span><span class="n">current</span><span class="w"> </span><span class="no">RFLAGS</span><span class="w"> </span><span class="n">into</span><span class="w"> </span><span class="n">R11</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">RFLAGS</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">RFLAGS</span><span class="w"> </span><span class="no">AND</span><span class="w"> </span><span class="no">NOT</span><span class="p">(</span><span class="no">IA32_FMASK</span><span class="p">);</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Mask</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="n">specified</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="no">IA32_FMASK</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">Selector</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">IA32_STAR</span><span class="p">[</span><span class="mi">47</span>:<span class="mi">32</span><span class="p">]</span><span class="w"> </span><span class="no">AND</span><span class="w"> </span><span class="no">FFFCH</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Operating</span><span class="w"> </span><span class="n">system</span><span class="w"> </span><span class="n">provides</span><span class="w"> </span><span class="no">CS</span><span class="p">;</span><span class="w"> </span><span class="no">RPL</span><span class="w"> </span><span class="n">forced</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Set</span><span class="w"> </span><span class="n">rest</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="no">CS</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">fixed</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">Base</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">       </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Flat</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">Limit</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">FFFFFH</span><span class="p">;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">KByte</span><span class="w"> </span><span class="n">granularity</span><span class="p">,</span><span class="w"> </span><span class="n">implies</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">GByte</span><span class="w"> </span><span class="n">limit</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">Type</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">;</span><span class="w">      </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Execute</span><span class="o">/</span><span class="n">read</span><span class="w"> </span><span class="n">code</span><span class="p">,</span><span class="w"> </span><span class="n">accessed</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">S</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="no">DPL</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">P</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">L</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Entry</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">mode</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">D</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Required</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="no">CS</span><span class="p">.</span><span class="n">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CS</span><span class="p">.</span><span class="n">G</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">KByte</span><span class="w"> </span><span class="n">granularity</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">IF</span><span class="w"> </span><span class="n">ShadowStackEnabled</span><span class="p">(</span><span class="no">CPL</span><span class="p">)</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">THEN</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Adjust</span><span class="w"> </span><span class="n">so</span><span class="w"> </span><span class="n">bits</span><span class="w"> </span><span class="mi">63</span>:<span class="nc">N</span><span class="w"> </span><span class="n">get</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">bit</span><span class="w"> </span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="n">is</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="no">CPU</span><span class="err">’</span><span class="n">s</span><span class="w"> </span><span class="n">maximum</span><span class="w"> </span><span class="n">linear</span><span class="o">-</span><span class="n">address</span><span class="w"> </span><span class="n">width</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="no">IA32_PL3_SSP</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="n">LA_adjust</span><span class="p">(</span><span class="no">SSP</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Preserve</span><span class="w"> </span><span class="no">IA32_PL3_SSP</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">system</span><span class="w"> </span><span class="n">calls</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">FI</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">CPL</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Change</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">privilege</span><span class="w"> </span><span class="n">level</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">IF</span><span class="w"> </span><span class="n">ShadowStackEnabled</span><span class="p">(</span><span class="no">CPL</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="no">SSP</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Clear</span><span class="w"> </span><span class="n">Shadow</span><span class="w"> </span><span class="n">Stack</span><span class="w"> </span><span class="n">Pointer</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">FI</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">Selector</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">IA32_STAR</span><span class="p">[</span><span class="mi">47</span>:<span class="mi">32</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="no">SS</span><span class="w"> </span><span class="n">just</span><span class="w"> </span><span class="n">above</span><span class="w"> </span><span class="no">CS</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Set</span><span class="w"> </span><span class="n">rest</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="no">SS</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">fixed</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">Base</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">       </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Flat</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">Limit</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="no">FFFFFH</span><span class="p">;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">KByte</span><span class="w"> </span><span class="n">granularity</span><span class="p">,</span><span class="w"> </span><span class="n">implies</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">GByte</span><span class="w"> </span><span class="n">limit</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">Type</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">       </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="n">Read</span><span class="o">/</span><span class="n">write</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">accessed</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">S</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="no">DPL</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">P</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">B</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="mi">32</span><span class="o">-</span><span class="n">bit</span><span class="w"> </span><span class="n">stack</span><span class="w"> </span><span class="n">segment</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="no">SS</span><span class="p">.</span><span class="n">G</span><span class="w"> </span>:<span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="o">-</span><span class="n">KByte</span><span class="w"> </span><span class="n">granularity</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-14.png"></p>
+<p><strong>Set a BreakPoint in NtAllocVirtualMemory</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="mi">6</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bp</span><span class="w"> </span><span class="n">nt</span><span class="o">!</span><span class="n">NtAllocateVirtualMemory</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">6</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bl</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="mi">0</span><span class="w"> </span><span class="n">e</span><span class="w"> </span><span class="n">Disable</span><span class="w"> </span><span class="n">Clear</span><span class="w">  </span><span class="n">fffff807</span><span class="err">`</span><span class="mf">0e699390</span><span class="w">     </span><span class="mi">0001</span><span class="w"> </span><span class="p">(</span><span class="mi">0001</span><span class="p">)</span><span class="w"> </span><span class="n">nt</span><span class="o">!</span><span class="n">NtAllocateVirtualMemory</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">6</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">g</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Breakpoint</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="n">hit</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">nt</span><span class="o">!</span><span class="n">NtAllocateVirtualMemory</span>:
+</span></span><span class="line"><span class="cl"><span class="nc">fffff807</span><span class="err">`</span><span class="mf">0e699390</span><span class="w"> </span><span class="mi">488</span><span class="n">bc4</span><span class="w">          </span><span class="n">mov</span><span class="w">     </span><span class="n">rax</span><span class="p">,</span><span class="n">rsp</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">5: kd&gt; !thread
+</span></span><span class="line"><span class="cl">THREAD ffff878ff0503500  Cid 1f64.1fa0  Teb: 0000000004aa7000 Win32Thread: ffff878ff0f14b20 RUNNING on processor <span class="m">5</span>
+</span></span><span class="line"><span class="cl">Not impersonating
+</span></span><span class="line"><span class="cl">DeviceMap                 ffffb40ac8a36b40
+</span></span><span class="line"><span class="cl">Owning Process            ffff878fefe6b080       Image:         mscorsvw.exe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Attached Process          N/A            Image:         N/A
+</span></span><span class="line"><span class="cl">Wait Start TickCount      <span class="m">23487</span>          Ticks: <span class="m">14</span> <span class="o">(</span>0:00:00:00.218<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Context Switch Count      <span class="m">551</span>            IdealProcessor: <span class="m">5</span>             
+</span></span><span class="line"><span class="cl">UserTime                  00:00:03.015
+</span></span><span class="line"><span class="cl">KernelTime                00:00:00.281
+</span></span><span class="line"><span class="cl">Win32 Start Address 0x0000000000345180
+</span></span><span class="line"><span class="cl">Stack Init ffffdb83fc23f650 Current ffffdb83fc23e680
+</span></span><span class="line"><span class="cl">Base ffffdb83fc240000 Limit ffffdb83fc239000 Call <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">Priority <span class="m">6</span>  BasePriority <span class="m">6</span>  IoPriority <span class="m">2</span>  PagePriority <span class="m">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Child-SP          RetAddr               : Args to Child                                                           : Call Site
+</span></span><span class="line"><span class="cl">ffffdb83<span class="sb">`</span>fc23f448 fffff807<span class="sb">`</span>0e42b4f5     : 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span>0492df98 : nt!NtAllocateVirtualMemory
+</span></span><span class="line"><span class="cl">ffffdb83<span class="sb">`</span>fc23f450 00007ff8<span class="sb">`</span>d39cd364     : 00007ff8<span class="sb">`</span>d199d6d9 00000000<span class="sb">`</span>04cfdee8 00000000<span class="sb">`</span>04cfdeec 00000000<span class="sb">`</span><span class="m">00003000</span> : nt!KiSystemServiceCopyEnd+0x25 <span class="o">(</span>TrapFrame @ ffffdb83<span class="sb">`</span>fc23f4c0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492df78 00007ff8<span class="sb">`</span>d199d6d9     : 00000000<span class="sb">`</span>04cfdee8 00000000<span class="sb">`</span>04cfdeec 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span>0492dff0 : 0x00007ff8<span class="sb">`</span>d39cd364
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492df80 00000000<span class="sb">`</span>04cfdee8     : 00000000<span class="sb">`</span>04cfdeec 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span>0492dff0 00000000<span class="sb">`</span><span class="m">00003000</span> : 0x00007ff8<span class="sb">`</span>d199d6d9
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492df88 00000000<span class="sb">`</span>04cfdeec     : 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span>0492dff0 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span><span class="m">00000004</span> : 0x4cfdee8
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492df90 00000000<span class="sb">`</span><span class="m">00003000</span>     : 00000000<span class="sb">`</span>0492dff0 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span><span class="m">00000004</span> 00000000<span class="sb">`</span><span class="m">00000000</span> : 0x4cfdeec
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492df98 00000000<span class="sb">`</span>0492dff0     : 00000000<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span><span class="m">00000004</span> 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span>04aa9000 : 0x3000
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492dfa0 00000000<span class="sb">`</span><span class="m">00003000</span>     : 00000000<span class="sb">`</span><span class="m">00000004</span> 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span>04aa9000 00000000<span class="sb">`</span><span class="m">00000004</span> : 0x492dff0
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492dfa8 00000000<span class="sb">`</span><span class="m">00000004</span>     : 00000000<span class="sb">`</span><span class="m">00000000</span> 00000000<span class="sb">`</span>04aa9000 00000000<span class="sb">`</span><span class="m">00000004</span> ffffffff<span class="sb">`</span><span class="m">00003000</span> : 0x3000
+</span></span><span class="line"><span class="cl">00000000<span class="sb">`</span>0492dfb0 00000000<span class="sb">`</span><span class="m">00000000</span>     : 00000000<span class="sb">`</span>04aa9000 00000000<span class="sb">`</span><span class="m">00000004</span> ffffffff<span class="sb">`</span><span class="m">00003000</span> 00000000<span class="sb">`</span>fffeffff : 0x4
+</span></span></code></pre></div><p><strong>Read the MSR</strong></p>
+<ul>
+<li>MSR c0000101 : points to GS base</li>
+<li>MSR c0000102 : points to Kernel GS</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="mi">5</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rdmsr</span><span class="w"> </span><span class="n">c0000101</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">msr</span><span class="p">[</span><span class="n">c0000101</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ffffc900</span><span class="err">`</span><span class="mi">5</span><span class="n">f90a000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="mi">5</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">rdmsr</span><span class="w"> </span><span class="n">c0000102</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">msr</span><span class="p">[</span><span class="n">c0000102</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">00000000</span><span class="err">`</span><span class="mi">04</span><span class="n">aa7000</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li>Wait a minute !. The address looks different here</li>
+<li>c0000101 points to kernel space while c0000102 points to user space</li>
+<li>It&rsquo;s because the swapgs already executed here.</li>
+<li>Set a breakpoint at msr <code>c0000082</code>.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; rdmsr c0000082
+</span></span><span class="line"><span class="cl">msr<span class="o">[</span>c0000082<span class="o">]</span> <span class="o">=</span> fffff807<span class="sb">`</span>0ea35180
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; u fffff807<span class="sb">`</span>0ea35180
+</span></span><span class="line"><span class="cl">nt!KiSystemCall64Shadow:
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea35180 0f01f8          swapgs                                        -&gt; Ring <span class="m">3</span> GS and Ring <span class="m">0</span> GS exchanged !
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea35183 <span class="m">654889242510900000</span> mov   qword ptr gs:<span class="o">[</span>9010h<span class="o">]</span>,rsp             -&gt; _KPCR._KPRCB.UserRspShadow
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea3518c 65488b242500900000 mov   rsp,qword ptr gs:<span class="o">[</span>9000h<span class="o">]</span>             -&gt; _KPCR._KPRCB.KernelDirectoryTableBase
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea35195 650fba24251890000001 bt  dword ptr gs:<span class="o">[</span>9018h<span class="o">]</span>,1               -&gt; _KPCR._KPRCB.ShadowFlags <span class="p">&amp;</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea3519f <span class="m">7203</span>            jb      nt!KiSystemCall64Shadow+0x24 <span class="o">(</span>fffff807<span class="sb">`</span>0ea351a4<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea351a1 0f22dc          mov     cr3,rsp
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea351a4 65488b242508900000 mov   rsp,qword ptr gs:<span class="o">[</span>9008h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>0ea351ad 6a2b            push    2Bh
+</span></span></code></pre></div><p>Similarly,</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="mi">2</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemCall64</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemCall64</span>:
+</span></span><span class="line"><span class="cl"><span class="nc">fffff806</span><span class="err">`</span><span class="mi">45216000</span><span class="w"> </span><span class="mi">0</span><span class="n">f01f8</span><span class="w">          </span><span class="n">swapgs</span><span class="w">                                </span>-&gt; <span class="nc">Ring</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="no">GS</span><span class="w"> </span><span class="n">and</span><span class="w"> </span><span class="n">Ring</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="no">GS</span><span class="w"> </span><span class="n">exchanged</span><span class="w"> </span><span class="o">!</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">45216003</span><span class="w"> </span><span class="mi">654889242510000000</span><span class="w"> </span><span class="n">mov</span><span class="w">   </span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">gs</span>:<span class="p">[</span><span class="mi">10</span><span class="n">h</span><span class="p">],</span><span class="n">rsp</span><span class="w">       </span>-&gt; <span class="nc">_KPCR</span><span class="p">.</span><span class="n">UserRsp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">4521600</span><span class="n">c</span><span class="w"> </span><span class="mi">65488</span><span class="n">b2425a8010000</span><span class="w"> </span><span class="n">mov</span><span class="w">   </span><span class="n">rsp</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">gs</span>:<span class="p">[</span><span class="mi">1</span><span class="n">A8h</span><span class="p">]</span><span class="w">      </span>-&gt; <span class="nc">_KPCR</span><span class="p">.</span><span class="no">_KPRCB</span><span class="p">.</span><span class="n">RspBase</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">45216015</span><span class="w"> </span><span class="mi">6</span><span class="n">a2b</span><span class="w">            </span><span class="n">push</span><span class="w">    </span><span class="mi">2</span><span class="n">Bh</span><span class="w">                           
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">45216017</span><span class="w"> </span><span class="mi">65</span><span class="n">ff342510000000</span><span class="w"> </span><span class="n">push</span><span class="w">    </span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="n">gs</span>:<span class="p">[</span><span class="mi">10</span><span class="n">h</span><span class="p">]</span><span class="w">           </span>-&gt; <span class="nc">_KPCR</span><span class="p">.</span><span class="n">Ntlib</span><span class="p">.</span><span class="n">StackLimit</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="no">_KPCR</span><span class="p">.</span><span class="n">UserRsp</span><span class="w"> </span>-&gt; <span class="nc">both</span><span class="w"> </span><span class="n">will</span><span class="w"> </span><span class="n">have</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="n">value</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">4521601</span><span class="n">f</span><span class="w"> </span><span class="mi">4153</span><span class="w">            </span><span class="n">push</span><span class="w">    </span><span class="n">r11</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">45216021</span><span class="w"> </span><span class="mi">6</span><span class="n">a33</span><span class="w">            </span><span class="n">push</span><span class="w">    </span><span class="mi">33</span><span class="n">h</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff806</span><span class="err">`</span><span class="mi">45216023</span><span class="w"> </span><span class="mi">51</span><span class="w">              </span><span class="n">push</span><span class="w">    </span><span class="n">rcx</span><span class="w">
+</span></span></span></code></pre></div><p><strong>Native Function &amp; GUI Function</strong></p>
+<ul>
+<li>Native Function APIs call <strong>ntdll.dll</strong>, which routes the request to kernel mode where the <strong>syscall</strong> is made from <strong>ntdll.dll</strong>.</li>
+<li>GUI function APIs call the corresponding GUI-related DLL (e.g., <strong>user32.dll</strong>), which routes the request to kernel mode, but the <strong>syscall</strong> is made from <strong>win32u.dll</strong>.</li>
+</ul>
+<p>[Image - NormalFunctionCall]
+[Image - GuiFunctionCall]</p>
+<p><strong>KiSystemServiceUser</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; u nt!KiSystemServiceUser
+</span></span><span class="line"><span class="cl">nt!KiSystemServiceUser:
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42723a c645ab02        mov     byte ptr <span class="o">[</span>rbp-55h<span class="o">]</span>,2                              
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42723e 65488b1c2588010000 mov   rbx,qword ptr gs:<span class="o">[</span>188h<span class="o">]</span>          <span class="p">;</span> _KPCR._KPRCB.CurrentThread 
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427247 0f0d8b90000000  prefetchw <span class="o">[</span>rbx+90h<span class="o">]</span>                       <span class="p">;</span> _KTHREAD.TrapFrame
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42724e 0fae5dac        stmxcsr dword ptr <span class="o">[</span>rbp-54h<span class="o">]</span>               
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427252 650fae142580010000 ldmxcsr dword ptr gs:<span class="o">[</span>180h<span class="o">]</span>            <span class="p">;</span> _KPCR._KPRCB 
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42725b 807b0300        cmp     byte ptr <span class="o">[</span>rbx+3<span class="o">]</span>,0                <span class="p">;</span> _KTHREAD.TimerMiscFlags
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42725f 66c785800000000000 mov   word ptr <span class="o">[</span>rbp+80h<span class="o">]</span>,0
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427268 0f84d0000000    je      nt!KiSystemServiceUser+0x104 <span class="o">(</span>fffff807<span class="sb">`</span>1e42733e<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42726e f6430303        <span class="nb">test</span>    byte ptr <span class="o">[</span>rbx+3<span class="o">]</span>,3                <span class="p">;</span> _KTHREAD.TimerMiscFlags
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427272 4c8945c8        mov     qword ptr <span class="o">[</span>rbp-38h<span class="o">]</span>,r8
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427276 4c894dd0        mov     qword ptr <span class="o">[</span>rbp-30h<span class="o">]</span>,r9
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42727a <span class="m">7405</span>            je      nt!KiSystemServiceUser+0x47 <span class="o">(</span>fffff807<span class="sb">`</span>1e427281<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42727c e86fcffeff      call    nt!KiSaveDebugRegisterState <span class="o">(</span>fffff807<span class="sb">`</span>1e4141f0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427281 f6430324        <span class="nb">test</span>    byte ptr <span class="o">[</span>rbx+3<span class="o">]</span>,24h              <span class="p">;</span> _KTHREAD.TimerMiscFlags.IndexBits
+</span></span><span class="line"><span class="cl">......
+</span></span><span class="line"><span class="cl">.....   
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272e3 b9020100c0      mov     ecx,0C0000102h
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272e8 0f32            rdmsr                                     <span class="p">;</span> Lower 32-bit in EAX <span class="p">&amp;</span> upper 32-bit in EDX                       
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272ea 48c1e220        shl     rdx,20h                           
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272ee 480bc2          or      rax,rdx                           <span class="p">;</span> <span class="nv">RAX</span> <span class="o">=</span>   _KPCR      
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272f1 483b05e022c1ff  cmp     rax,qword ptr <span class="o">[</span>nt!MmUserProbeAddress <span class="o">(</span>fffff807<span class="sb">`</span>1e0395d8<span class="o">)]</span>     <span class="p">;</span> Defines the highest boundary, distinguish User Mode <span class="p">&amp;</span> Kernel Mode
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4272f8 480f4305d822c1ff cmovae  rax,qword ptr <span class="o">[</span>nt!MmUserProbeAddress <span class="o">(</span>fffff807<span class="sb">`</span>1e0395d8<span class="o">)]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427300 483983f0000000  cmp     qword ptr <span class="o">[</span>rbx+0F0h<span class="o">]</span>,rax         <span class="p">;</span> _KTHREAD.Teb 
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427307 <span class="m">7422</span>            je      nt!KiSystemServiceUser+0xf1 <span class="o">(</span>fffff807<span class="sb">`</span>1e42732b<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427309 488b93f0010000  mov     rdx,qword ptr <span class="o">[</span>rbx+1F0h<span class="o">]</span>         <span class="p">;</span> _KTHREAD.Ucb
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427310 0fba6b7408      bts     dword ptr <span class="o">[</span>rbx+74h<span class="o">]</span>,8            <span class="p">;</span> _KTRHEAD.MiscFlags
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427315 66ff8be6010000  dec     word ptr <span class="o">[</span>rbx+1E6h<span class="o">]</span>              <span class="p">;</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42731c <span class="m">48898280000000</span>  mov     qword ptr <span class="o">[</span>rdx+80h<span class="o">]</span>,rax          
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427323 fb              sti
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427324 e817190000      call    nt!KiUmsCallEntry <span class="o">(</span>fffff807<span class="sb">`</span>1e428c40<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427329 eb0b            jmp     nt!KiSystemServiceUser+0xfc <span class="o">(</span>fffff807<span class="sb">`</span>1e427336<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42732b f6430340        <span class="nb">test</span>    byte ptr <span class="o">[</span>rbx+3<span class="o">]</span>,40h      
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42732f <span class="m">7405</span>            je      nt!KiSystemServiceUser+0xfc <span class="o">(</span>fffff807<span class="sb">`</span>1e427336<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427331 0fba6b7410      bts     dword ptr <span class="o">[</span>rbx+74h<span class="o">]</span>,10h           <span class="p">;</span> _KTRHEAD.MiscFlags
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427336 4c8b45c8        mov     r8,qword ptr <span class="o">[</span>rbp-38h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42733a 4c8b4dd0        mov     r9,qword ptr <span class="o">[</span>rbp-30h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42733e 488b45b0        mov     rax,qword ptr <span class="o">[</span>rbp-50h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427342 488b4db8        mov     rcx,qword ptr <span class="o">[</span>rbp-48h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427346 488b55c0        mov     rdx,qword ptr <span class="o">[</span>rbp-40h<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42734a fb              sti
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42734b 48898b88000000  mov     qword ptr <span class="o">[</span>rbx+88h<span class="o">]</span>,rcx           <span class="p">;</span> _KTHREAD.FirstArgument
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427352 <span class="m">898380000000</span>    mov     dword ptr <span class="o">[</span>rbx+80h<span class="o">]</span>,eax           <span class="p">;</span> _KTHREAD.SystemCallNumber
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427358 0f1f840000000000 nop     dword ptr <span class="o">[</span>rax+rax<span class="o">]</span>
+</span></span></code></pre></div><p><strong>InfoSummary</strong></p>
+<ul>
+<li>rcx : FirstArgument</li>
+<li>eax : SystemCallNumber</li>
+</ul>
+<p><strong>KiSystemServiceStart</strong></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="mi">0</span>: <span class="nc">kd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceStart</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceStart</span>:
+</span></span><span class="line"><span class="cl"><span class="nc">fffff807</span><span class="err">`</span><span class="mf">1e427360</span><span class="w"> </span><span class="mi">4889</span><span class="n">a390000000</span><span class="w">  </span><span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbx</span><span class="o">+</span><span class="mi">90</span><span class="n">h</span><span class="p">],</span><span class="n">rsp</span><span class="w">               
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427367</span><span class="w"> </span><span class="mi">8</span><span class="n">bf8</span><span class="w">            </span><span class="n">mov</span><span class="w">     </span><span class="n">edi</span><span class="p">,</span><span class="n">eax</span><span class="w">                   </span><span class="p">;</span><span class="w"> </span><span class="n">edi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SystemCallNumber</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427369</span><span class="w"> </span><span class="n">c1ef07</span><span class="w">          </span><span class="n">shr</span><span class="w">     </span><span class="n">edi</span><span class="p">,</span><span class="mi">7</span><span class="w">                     </span><span class="p">;</span><span class="w"> </span><span class="n">edi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">edi</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">7</span><span class="w">       
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42736</span><span class="n">c</span><span class="w"> </span><span class="mf">83e720</span><span class="w">          </span><span class="n">and</span><span class="w">     </span><span class="n">edi</span><span class="p">,</span><span class="mi">20</span><span class="n">h</span><span class="w">                   </span><span class="p">;</span><span class="w"> </span><span class="n">edi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">edi</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x20</span><span class="w">   </span><span class="o">-</span>-&gt; <span class="nc">Table</span><span class="w"> </span><span class="n">Identifier</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42736</span><span class="n">f</span><span class="w"> </span><span class="mi">25</span><span class="n">ff0f0000</span><span class="w">      </span><span class="n">and</span><span class="w">     </span><span class="n">eax</span><span class="p">,</span><span class="mi">0</span><span class="n">FFFh</span><span class="w">                 </span><span class="p">;</span><span class="w"> </span><span class="n">eax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eax</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x0fff</span><span class="w">   
+</span></span></span></code></pre></div><ul>
+<li>This function call is particularly used for info extraction.</li>
+<li>It extracts System call index and Table Identifier.</li>
+</ul>
+<p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-9.png"></p>
+<p>Suppose SystemCall Value : <code>0xcf</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"> EDI :  <span class="m">0000000011001111</span>
+</span></span><span class="line"><span class="cl">    &gt;&gt;                 <span class="m">7</span> 
+</span></span><span class="line"><span class="cl">        ----------------
+</span></span><span class="line"><span class="cl"> EDI :  <span class="m">0000000000000001</span>
+</span></span><span class="line"><span class="cl">  AND   <span class="m">0000000000100000</span> 
+</span></span><span class="line"><span class="cl">        ----------------
+</span></span><span class="line"><span class="cl">        <span class="m">0000000000000000</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> EAX  : <span class="m">0000000011001111</span>
+</span></span><span class="line"><span class="cl">  AND   <span class="m">0000111111111111</span>
+</span></span><span class="line"><span class="cl">        ----------------
+</span></span><span class="line"><span class="cl">        <span class="m">0000000011001111</span>
+</span></span></code></pre></div><ul>
+<li>There are two distinct table identifiers: <strong>0x00</strong> and <strong>0x01</strong>.Windows 10 &amp; 11 has <strong>0x20</strong> not <strong>0x01</strong>.</li>
+<li>As mentioned earlier, Win API which calls sycall through ntdll.dll and has sycall ranges from 0x0 - 0x0fff. For GUI, the syscall ranges from 1000 - 0x1fff and made throuhg win32u.dll</li>
+</ul>
+<p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-10.png"></p>
+<p><strong>KiSystemServiceRepeat</strong></p>
+<ul>
+<li>This is the most interesting part and is main part of the syscall.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">nt!KiSystemServiceRepeat:
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427374 4c8d1545259f00  lea     r10,<span class="o">[</span>nt!KeServiceDescriptorTable <span class="o">(</span>fffff807<span class="sb">`</span>1ee198c0<span class="o">)]</span>  
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42737b 4c8d1dbed68e00  lea     r11,<span class="o">[</span>nt!KeServiceDescriptorTableShadow <span class="o">(</span>fffff807<span class="sb">`</span>1ed14a40<span class="o">)]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427382 f7437880000000  <span class="nb">test</span>    dword ptr <span class="o">[</span>rbx+78h<span class="o">]</span>,80h                                  <span class="p">;</span> _KTHREAD-&gt;ThreadFlags <span class="p">;</span> Sets ThreadFlgas.GuiThread <span class="nv">bit</span> <span class="o">==</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427389 <span class="m">7413</span>            je      nt!KiSystemServiceRepeat+0x2a <span class="o">(</span>fffff807<span class="sb">`</span>1e42739e<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42738b f7437800002000  <span class="nb">test</span>    dword ptr <span class="o">[</span>rbx+78h<span class="o">]</span>,200000h                              <span class="p">;</span> _ETHREAD-&gt;ThreadFlags.RestrictedGuiThread  <span class="o">==</span> <span class="m">1</span> 
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427392 <span class="m">7407</span>            je      nt!KiSystemServiceRepeat+0x27 <span class="o">(</span>fffff807<span class="sb">`</span>1e42739b<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e427394 4c8d1d65d88e00  lea     r11,<span class="o">[</span>nt!KeServiceDescriptorTableFilter <span class="o">(</span>fffff807<span class="sb">`</span>1ed14c00<span class="o">)]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42739b 4d8bd3          mov     r10,r11
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e42739e 413b443a10      cmp     eax,dword ptr <span class="o">[</span>r10+rdi+10h<span class="o">]</span> &lt;------- jmp here <span class="k">if</span> <span class="nv">GuiThread</span> <span class="o">==</span> <span class="m">0</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273a3 0f8398070000    jae     nt!KiSystemServiceExitPico+0x296 <span class="o">(</span>fffff807<span class="sb">`</span>1e427b41<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273a9 4d8b143a        mov     r10,qword ptr <span class="o">[</span>r10+rdi<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273ad 4d631c82        movsxd  r11,dword ptr <span class="o">[</span>r10+rax*4<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b1 498bc3          mov     rax,r11
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b4 49c1fb04        sar     r11,4
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b8 4d03d3          add     r10,r11
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273bb 83ff20          cmp     edi,20h
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273be <span class="m">7550</span>            jne     nt!KiSystemServiceGdiTebAccess+0x49 <span class="o">(</span>fffff807<span class="sb">`</span>1e427410<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273c0 4c8b9bf0000000  mov     r11,qword ptr <span class="o">[</span>rbx+0F0h<span class="o">]</span>
+</span></span></code></pre></div><ul>
+<li>There are two Service Descriptor Table i.e. <code>KeServiceDescriptorTable</code> &amp; <code>KeServiceDescriptorTableShadow</code></li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">tag_SERVICE_DESCRIPTOR_TABLE</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SYSTEM_SERVICE_TABLE</span> <span class="n">item1</span><span class="p">;</span>  <span class="c1">// ntoskrnl
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">SYSTEM_SERVICE_TABLE</span> <span class="n">item2</span><span class="p">;</span>  <span class="c1">// win32k
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">SYSTEM_SERVICE_TABLE</span> <span class="n">item3</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SYSTEM_SERVICE_TABLE</span> <span class="n">item4</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">SERVICE_DESCRIPTOR_TABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">tag_SYSTEM_SERVICE_TABLE</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PULONG</span>      <span class="n">ServiceTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PULONG_PTR</span>  <span class="n">CounterTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG_PTR</span>   <span class="n">ServiceLimit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PBYTE</span>       <span class="n">ArgumentTable</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">SYSTEM_SERVICE_TABLE</span><span class="p">;</span>
+</span></span></code></pre></div><ul>
+<li>SERVICE_DESCRIPTOR_TABLE has 4 members item1, item2, item3, item4 each of type <code>SYSTEM_SERVICE_TABLE</code> which has further 4 members i.e ServiceTable, CounterTable, ServiceLimit &amp; ArgumentTable</li>
+</ul>
+<p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-11.png"></p>
+<p><strong>Note</strong></p>
+<ul>
+<li>r10 : KeServiceDescriptorTable</li>
+<li>r11 : KeServiceDescriptorTableShadow</li>
+<li>rdi : Table Idenitifier</li>
+<li>rax : SystemCall Value</li>
+<li>rbx : _KTHREAD</li>
+</ul>
+<p><code>test    dword ptr [rbx+78h],80h  </code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_KTHREAD -y GuiThread
+</span></span><span class="line"><span class="cl">   +0x078 GuiThread : Pos 7, <span class="m">1</span> Bit
+</span></span></code></pre></div><ul>
+<li>checks GUIThread Bit is set or unset. It is unset for the first time no matter whether its a GUI function or Native Function. It would be set to 1 later on.</li>
+<li>Based on the function type, the table identifier would be choosen.</li>
+</ul>
+<p><code>test    dword ptr [rbx+78h],200000h   </code></p>
+<p>If this bit is set, then it jumps to <code>nt!KiSystemServiceRepeat+0x27</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceRepeat</span><span class="o">+</span><span class="mh">0x27</span>:
+</span></span><span class="line"><span class="cl"><span class="nc">fffff807</span><span class="err">`</span><span class="mf">1e42739</span><span class="n">b</span><span class="w"> </span><span class="mi">4</span><span class="n">d8bd3</span><span class="w">          </span><span class="n">mov</span><span class="w">     </span><span class="n">r10</span><span class="p">,</span><span class="n">r11</span><span class="w">                      </span><span class="o">&lt;---</span><span class="w"> </span><span class="n">moves</span><span class="w"> </span><span class="n">KeServiceDescriptorTableShadow</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">r10</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42739</span><span class="n">e</span><span class="w"> </span><span class="mi">413</span><span class="n">b443a10</span><span class="w">      </span><span class="n">cmp</span><span class="w">     </span><span class="n">eax</span><span class="p">,</span><span class="n">dword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="o">+</span><span class="mi">10</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a3</span><span class="w"> </span><span class="mi">0</span><span class="n">f8398070000</span><span class="w">    </span><span class="n">jae</span><span class="w">     </span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceExitPico</span><span class="o">+</span><span class="mh">0x296</span><span class="w"> </span><span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b41</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a9</span><span class="w"> </span><span class="mi">4</span><span class="n">d8b143a</span><span class="w">        </span><span class="n">mov</span><span class="w">     </span><span class="n">r10</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">ad</span><span class="w"> </span><span class="mi">4</span><span class="n">d631c82</span><span class="w">        </span><span class="n">movsxd</span><span class="w">  </span><span class="n">r11</span><span class="p">,</span><span class="n">dword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b1</span><span class="w"> </span><span class="mi">498</span><span class="n">bc3</span><span class="w">          </span><span class="n">mov</span><span class="w">     </span><span class="n">rax</span><span class="p">,</span><span class="n">r11</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b4</span><span class="w"> </span><span class="mi">49</span><span class="n">c1fb04</span><span class="w">        </span><span class="n">sar</span><span class="w">     </span><span class="n">r11</span><span class="p">,</span><span class="mi">4</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b8</span><span class="w"> </span><span class="mi">4</span><span class="n">d03d3</span><span class="w">          </span><span class="n">add</span><span class="w">     </span><span class="n">r10</span><span class="p">,</span><span class="n">r11</span><span class="w">
+</span></span></span></code></pre></div><p>In general,</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">_KTHREAD</span><span class="o">-&gt;</span><span class="n">ThreadFlags</span><span class="p">.</span><span class="n">GuiThread</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r11</span> <span class="o">=</span> <span class="n">KeServiceDescriptorTable</span>
+</span></span><span class="line"><span class="cl">    <span class="n">r10</span> <span class="o">=</span> <span class="n">r11</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">_ETHREAD</span><span class="o">-&gt;</span><span class="n">ThreadFlags</span><span class="p">.</span><span class="n">RestrictedGuiThread</span>  <span class="o">==</span> <span class="mi">1</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r10</span> <span class="o">=</span> <span class="n">KeServiceDescriptorTableFilter</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">r11</span> <span class="o">=</span> <span class="n">r10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r10</span> <span class="o">=</span> <span class="n">KeServiceDescriptorTableShadow</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">r11</span> <span class="o">=</span> <span class="n">r10</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><code>test    dword ptr [rbx+78h],200000h   </code></p>
+<p>If this RestrictedGuiThread is unset, then it jumps to <code>nt!KiSystemServiceRepeat+0x27</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceRepeat</span><span class="o">+</span><span class="mh">0x27</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42739</span><span class="n">e</span> <span class="mi">413</span><span class="n">b443a10</span>      <span class="n">cmp</span>     <span class="n">eax</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="o">+</span><span class="mi">10</span><span class="n">h</span><span class="p">]</span>            <span class="o">&lt;-------</span> <span class="n">jmp</span> <span class="n">here</span> <span class="k">if</span> <span class="n">GuiThread</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a3</span> <span class="mf">0f</span><span class="mi">8398070000</span>    <span class="n">jae</span>     <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceExitPico</span><span class="o">+</span><span class="mh">0x296</span> <span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b41</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a9</span> <span class="mi">4</span><span class="n">d8b143a</span>        <span class="n">mov</span>     <span class="n">r10</span><span class="p">,</span><span class="n">qword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">ad</span> <span class="mi">4</span><span class="n">d631c82</span>        <span class="n">movsxd</span>  <span class="n">r11</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b1</span> <span class="mi">498</span><span class="n">bc3</span>          <span class="n">mov</span>     <span class="n">rax</span><span class="p">,</span><span class="n">r11</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b4</span> <span class="mi">49</span><span class="n">c1fb04</span>        <span class="n">sar</span>     <span class="n">r11</span><span class="p">,</span><span class="mi">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">b8</span> <span class="mi">4</span><span class="n">d03d3</span>          <span class="n">add</span>     <span class="n">r10</span><span class="p">,</span><span class="n">r11</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">bb</span> <span class="mf">83ff</span><span class="mi">20</span>          <span class="n">cmp</span>     <span class="n">edi</span><span class="p">,</span><span class="mi">20</span><span class="n">h</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">be</span> <span class="mi">7550</span>            <span class="n">jne</span>     <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceGdiTebAccess</span><span class="o">+</span><span class="mh">0x49</span> <span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427410</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">c0</span> <span class="mi">4</span><span class="n">c8b9bf0000000</span>  <span class="n">mov</span>     <span class="n">r11</span><span class="p">,</span><span class="n">qword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">rbx</span><span class="o">+</span><span class="mf">0F</span><span class="mi">0</span><span class="n">h</span><span class="p">]</span>
+</span></span></code></pre></div><p>For the first time, it would be unset.</p>
+<p><strong>Note</strong>
+r10 : KeServiceDescriptorTable
+rdi : Table Identifier <code>00</code> for Native, <code>20</code> for GUI Function</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="mi">0</span><span class="o">:</span> <span class="n">kd</span><span class="o">&gt;</span> <span class="n">dqs</span> <span class="n">nt</span><span class="o">!</span><span class="n">KeServiceDescriptorTable</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198c0</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mf">1e0</span><span class="n">df9f0</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiServiceTable</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198c8</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198d0</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">000001</span><span class="n">d8</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198d8</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mf">1e0</span><span class="n">e0154</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiArgumentTable</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198e0</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198e8</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198f0</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198f8</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19900</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea2f2c0</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiBreakpointTrapShadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19908</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea2f340</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiOverflowTrapShadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19910</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea2fd40</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiRaiseSecurityCheckFailureShadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19918</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea2fdc0</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiRaiseAssertionShadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19920</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea2fe40</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiDebugServiceTrapShadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19928</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea31180</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemCall64Shadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19930</span>  <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ea30e40</span> <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemCall32Shadow</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee19938</span>  <span class="mo">00000000</span><span class="err">`</span><span class="mo">00000000</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="mi">0</span><span class="o">:</span> <span class="n">kd</span><span class="o">&gt;</span> <span class="o">?</span> <span class="n">nt</span><span class="o">!</span><span class="n">KeServiceDescriptorTable</span> <span class="o">+</span> <span class="mh">0x00</span> <span class="o">+</span> <span class="mi">10</span>
+</span></span><span class="line"><span class="cl"><span class="n">Evaluate</span> <span class="nl">expression</span><span class="p">:</span> <span class="o">-</span><span class="mi">8765510149936</span> <span class="o">=</span> <span class="n">fffff807</span><span class="err">`</span><span class="mi">1</span><span class="n">ee198d0</span>
+</span></span></code></pre></div><p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-13.png"></p>
+<ul>
+<li>Service Table is an array of Relative Virtual Address which points to kernel routine.</li>
+<li>eax is check against ServiceTable in <code>SYSTEM_SERVICE_TABLE</code></li>
+</ul>
+<p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-17.png"></p>
+<p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-18.png"></p>
+<ul>
+<li>
+<p>If it&rsquo;s native function, it will continue the execution.</p>
+</li>
+<li>
+<p>NtLoadDriver Index : 0x106</p>
+</li>
+<li>
+<p><code>0x106 &lt; 0x1d8</code> - It lies in the Table limit.</p>
+</li>
+<li>
+<p>[ r10 + rdi ] -&gt; [ nt!KeServiceDescriptorTable + 0x00 ] -&gt; [ fffff807`1ee198d0 ]</p>
+</li>
+<li>
+<p>r10 = fffff807`1e0df9f0 (nt!KiServiceTable)</p>
+</li>
+<li>
+<p>r11 = [ fffff807`1e0df9f0 + 0x04 * 0x106 ] = [ fffff8071e0dfe08 ]</p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dd nt!KiServiceTable L1
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e0dfe08  06b50300
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="w">    </span><span class="mh">0x06b50300</span><span class="w">  </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mh">0x6b5030</span><span class="w">                         </span><span class="p">;</span><span class="w"> </span><span class="n">Preserve</span><span class="w"> </span><span class="n">Sign</span><span class="w"> </span><span class="n">Extension</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">+------------------------------+-------------------+</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">|</span><span class="w"> </span><span class="mi">0000000001101011010100000011</span><span class="w"> </span><span class="o">|</span><span class="w">       </span><span class="mi">0000</span><span class="w">        </span><span class="o">|</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">+------------------------------+-------------------+</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="no">RVA</span><span class="w">                        </span><span class="n">No</span><span class="w"> </span><span class="n">of</span><span class="w"> </span><span class="n">params</span><span class="w"> 
+</span></span></span><span class="line"><span class="cl"><span class="w">                                    </span><span class="n">passed</span><span class="w"> </span><span class="n">through</span><span class="w"> </span><span class="n">stack</span><span class="w">
+</span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="nf">NtLoadDriver</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_In_</span> <span class="n">PUNICODE_STRING</span> <span class="n">DriverServiceName</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span></code></pre></div><ul>
+<li>Only one parameter which is passed through rcx register.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; ? nt!KiServiceTable + 0x6b5030
+</span></span><span class="line"><span class="cl">Evaluate expression: -8765516985824 <span class="o">=</span> fffff807<span class="sb">`</span>1e794a20
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; u fffff807<span class="sb">`</span>1e794a20
+</span></span><span class="line"><span class="cl">nt!NtLoadDriver:
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a20 4883ec28        sub     rsp,28h
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a24 e8dfcfc1ff      call    nt!IopLoadDriverImage <span class="o">(</span>fffff807<span class="sb">`</span>1e3b1a08<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a29 4883c428        add     rsp,28h
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a2d c3              ret
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a2e cc              int     <span class="m">3</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a2f cc              int     <span class="m">3</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a30 cc              int     <span class="m">3</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e794a31 cc              int     <span class="m">3</span>
+</span></span></code></pre></div><p><strong>What if GUI Function ?</strong></p>
+<ul>
+<li>System Call Index of UserPromotePointer is 0x493.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42739</span><span class="n">e</span> <span class="mi">413</span><span class="n">b443a10</span>      <span class="n">cmp</span>     <span class="n">eax</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="o">+</span><span class="mi">10</span><span class="n">h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a3</span> <span class="mf">0f</span><span class="mi">8398070000</span>    <span class="n">jae</span>     <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceExitPico</span><span class="o">+</span><span class="mh">0x296</span> <span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b41</span><span class="p">)</span>
+</span></span></code></pre></div><ul>
+<li>
+<p>For GUI function, the SystemTable is 0 and <code>0x493 &gt; 0x0</code>.
+<img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-16.png"></p>
+</li>
+<li>
+<p>Undergoes multiple kernel mode checks &amp; eventually calls the macro</p>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_PERFINFO_THREAD_INFORMATION</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">StackBase</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">StackLimit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">UserStackBase</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">UserStackLimit</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">StartAddr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PVOID</span> <span class="n">Win32StartAddr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">ProcessId</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">ThreadId</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span>  <span class="n">WaitMode</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">PERFINFO_THREAD_INFORMATION</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define PERFINFO_CONVERT_TO_GUI_THREAD(EThread)                                                         \
+</span></span></span><span class="line"><span class="cl"><span class="cp">    if (PERFINFO_IS_GROUP_ON(PERF_MEMORY)) {                                                            \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        PERFINFO_THREAD_INFORMATION _ThreadInfo;                                                        \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.ProcessId = HandleToUlong((EThread)-&gt;Cid.UniqueProcess);                            \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.ThreadId = HandleToUlong((EThread)-&gt;Cid.UniqueThread);                              \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.StackBase = (EThread)-&gt;Tcb.StackBase;                                               \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.StackLimit = (EThread)-&gt;Tcb.StackLimit;                                             \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.UserStackBase = 0;                                                                  \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.UserStackLimit = 0;                                                                 \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.StartAddr = 0;                                                                      \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.Win32StartAddr = 0;                                                                 \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        _ThreadInfo.WaitMode = -1;                                                                      \
+</span></span></span><span class="line"><span class="cl"><span class="cp">        PerfInfoLogBytes(                                                                               \
+</span></span></span><span class="line"><span class="cl"><span class="cp">            PERFINFO_LOG_TYPE_CONVERTTOGUITHREAD,                                                       \
+</span></span></span><span class="line"><span class="cl"><span class="cp">            &amp;_ThreadInfo,                                                                               \
+</span></span></span><span class="line"><span class="cl"><span class="cp">            sizeof(_ThreadInfo)                                                                         \
+</span></span></span><span class="line"><span class="cl"><span class="cp">            );                                                                                          \
+</span></span></span><span class="line"><span class="cl"><span class="cp">    }
+</span></span></span></code></pre></div><ul>
+<li>It then sets Thread-&gt;Tcb.ServiceTable = (PVOID)&amp;KeServiceDescriptorTableShadow[0]</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-rs" data-lang="rs"><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b59</span><span class="w"> </span><span class="n">e8720bffff</span><span class="w">      </span><span class="n">call</span><span class="w">    </span><span class="n">nt</span><span class="o">!</span><span class="n">KiConvertToGuiThread</span><span class="w"> </span><span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4186</span><span class="n">d0</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b5e</span><span class="w"> </span><span class="mi">0</span><span class="n">bc0</span><span class="w">            </span><span class="n">or</span><span class="w">      </span><span class="n">eax</span><span class="p">,</span><span class="n">eax</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b60</span><span class="w"> </span><span class="mi">8</span><span class="n">b4580</span><span class="w">          </span><span class="n">mov</span><span class="w">     </span><span class="n">eax</span><span class="p">,</span><span class="n">dword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbp</span><span class="o">-</span><span class="mi">80</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b63</span><span class="w"> </span><span class="mi">488</span><span class="n">b4d88</span><span class="w">        </span><span class="n">mov</span><span class="w">     </span><span class="n">rcx</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbp</span><span class="o">-</span><span class="mi">78</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b67</span><span class="w"> </span><span class="mi">488</span><span class="n">b5590</span><span class="w">        </span><span class="n">mov</span><span class="w">     </span><span class="n">rdx</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbp</span><span class="o">-</span><span class="mi">70</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b6b</span><span class="w"> </span><span class="mi">4</span><span class="n">c8b4598</span><span class="w">        </span><span class="n">mov</span><span class="w">     </span><span class="n">r8</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbp</span><span class="o">-</span><span class="mi">68</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b6f</span><span class="w"> </span><span class="mi">4</span><span class="n">c8b4da0</span><span class="w">        </span><span class="n">mov</span><span class="w">     </span><span class="n">r9</span><span class="p">,</span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbp</span><span class="o">-</span><span class="mi">60</span><span class="n">h</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b73</span><span class="w"> </span><span class="mi">4889</span><span class="n">a390000000</span><span class="w">  </span><span class="n">mov</span><span class="w">     </span><span class="n">qword</span><span class="w"> </span><span class="n">ptr</span><span class="w"> </span><span class="p">[</span><span class="n">rbx</span><span class="o">+</span><span class="mi">90</span><span class="n">h</span><span class="p">],</span><span class="n">rsp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b7a</span><span class="w"> </span><span class="mi">0</span><span class="n">f84f4f7ffff</span><span class="w">    </span><span class="n">je</span><span class="w">      </span><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceRepeat</span><span class="w"> </span><span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427374</span><span class="p">)</span><span class="w">
+</span></span></span></code></pre></div><ul>
+<li>On success of <code>KiConvertToGuiThread</code>, it jumps to <code>KiSystemServiceRepeat</code>.</li>
+</ul>
+<p><strong>Note</strong></p>
+<p>r10 : KeServiceDescriptorTableShadow
+rdi : Table Identifier</p>
+<p>For Windows 10 and 11 : rdi = 0x20
+Before Windows 10     : rdi = 0x01</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceRepeat</span><span class="o">+</span><span class="mh">0x2a</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e42739</span><span class="n">e</span> <span class="mi">413</span><span class="n">b443a10</span>      <span class="n">cmp</span>     <span class="n">eax</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="o">+</span><span class="mi">10</span><span class="n">h</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a3</span> <span class="mf">0f</span><span class="mi">8398070000</span>    <span class="n">jae</span>     <span class="n">nt</span><span class="o">!</span><span class="n">KiSystemServiceExitPico</span><span class="o">+</span><span class="mh">0x296</span> <span class="p">(</span><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e427</span><span class="n">b41</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">a9</span> <span class="mi">4</span><span class="n">d8b143a</span>        <span class="n">mov</span>     <span class="n">r10</span><span class="p">,</span><span class="n">qword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rdi</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">fffff807</span><span class="err">`</span><span class="mf">1e4273</span><span class="n">ad</span> <span class="mi">4</span><span class="n">d631c82</span>        <span class="n">movsxd</span>  <span class="n">r11</span><span class="p">,</span><span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">r10</span><span class="o">+</span><span class="n">rax</span><span class="o">*</span><span class="mi">4</span><span class="p">]</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dqs nt!KeServiceDescriptorTableShadow
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a40  fffff807<span class="sb">`</span>1e0df9f0 nt!KiServiceTable
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a48  00000000<span class="sb">`</span><span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a50  00000000<span class="sb">`</span>000001d8
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a58  fffff807<span class="sb">`</span>1e0e0154 nt!KiArgumentTable
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a60  ffffe905<span class="sb">`</span>bef79000 win32k!W32pServiceTable
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a68  00000000<span class="sb">`</span><span class="m">00000000</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a70  00000000<span class="sb">`</span><span class="m">00000524</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1ed14a78  ffffe905<span class="sb">`</span>bef7a9bc win32k!W32pArgumentTable
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; ? nt!KeServiceDescriptorTableShadow + 0x20 + 0x10
+</span></span><span class="line"><span class="cl">Evaluate expression: -8765511218576 <span class="o">=</span> fffff807<span class="sb">`</span>1ed14a70
+</span></span></code></pre></div><p>System Call Index of UserPromotePointer is 0x493.</p>
+<p>eax = 0x524</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"> 0x493 &lt; 0x524
+</span></span></code></pre></div><ul>
+<li>It&rsquo;s smaller so jump won&rsquo;t be taken.</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273a9 4d8b143a        mov     r10,qword ptr <span class="o">[</span>r10+rdi<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273ad 4d631c82        movsxd  r11,dword ptr <span class="o">[</span>r10+rax*4<span class="o">]</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b1 498bc3          mov     rax,r11
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b4 49c1fb04        sar     r11,4
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273b8 4d03d3          add     r10,r11
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273bb 83ff20          cmp     edi,20h
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273be <span class="m">7550</span>            jne     nt!KiSystemServiceGdiTebAccess+0x49 <span class="o">(</span>fffff807<span class="sb">`</span>1e427410<span class="o">)</span>
+</span></span><span class="line"><span class="cl">fffff807<span class="sb">`</span>1e4273c0 4c8b9bf0000000  mov     r11,qword ptr <span class="o">[</span>rbx+0F0h<span class="o">]</span>
+</span></span></code></pre></div><p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-15.png"></p>
+<ul>
+<li>r10 : W32pServiceTable = ffffe905`bef79000</li>
+<li>rax : System Call Index Value = 0x493</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; ? win32k!W32pServiceTable + <span class="o">(</span>0x493 * 0x4<span class="o">)</span>
+</span></span><span class="line"><span class="cl">Evaluate expression: -25264088702388 <span class="o">=</span> ffffe905<span class="sb">`</span>bef7a24c
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; dd ffff8252<span class="sb">`</span>8ba7a24c L1
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba7a24c  ff8e3080
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        +----------------------------------+------------+
+</span></span><span class="line"><span class="cl">        <span class="p">|</span> <span class="m">11111111111110001110001100001000</span> <span class="p">|</span>    <span class="m">0000</span>    <span class="p">|</span>
+</span></span><span class="line"><span class="cl">        +----------------------------------+------------+
+</span></span><span class="line"><span class="cl">                RVA                          No of stack
+</span></span><span class="line"><span class="cl">                                               params
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0xff8e3080 &gt;&gt; <span class="m">4</span> : <span class="nv">0xfff8e308</span> <span class="o">=</span> 0xffffffff0xfff8e308 <span class="p">;</span> Preserve Sign Extension
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; ? win32k!W32pServiceTable + 0xfffffffffff8e308
+</span></span><span class="line"><span class="cl">Evaluate expression: -138183935233272 <span class="o">=</span> ffff8252<span class="sb">`</span>8ba07308
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; u ffff8252<span class="sb">`</span>8ba07308
+</span></span><span class="line"><span class="cl">win32k!NtUserPromotePointer:
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba07308 4883ec28        sub     rsp,28h
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba0730c 488b050df10500  mov     rax,qword ptr <span class="o">[</span>win32k!ext_ms_win_core_win32k_fulluser_l1+0x860 <span class="o">(</span>ffff8252<span class="sb">`</span>8ba66420<span class="o">)]</span>
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba07313 4885c0          <span class="nb">test</span>    rax,rax
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba07316 <span class="m">7406</span>            je      win32k!NtUserPromotePointer+0x16 <span class="o">(</span>ffff8252<span class="sb">`</span>8ba0731e<span class="o">)</span>
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba07318 ff1552e60600    call    qword ptr <span class="o">[</span>win32k!_guard_dispatch_icall_fptr <span class="o">(</span>ffff8252<span class="sb">`</span>8ba75970<span class="o">)]</span>
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba0731e 4883c428        add     rsp,28h
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba07322 c3              ret
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; ? win32k!W32pServiceTableFilter + <span class="m">4</span> * 0x493 
+</span></span><span class="line"><span class="cl">Evaluate expression: -138183934754500 <span class="o">=</span> ffff8252<span class="sb">`</span>8ba7c13c
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; dd ffff8252<span class="sb">`</span>8ba7c13c L1
+</span></span><span class="line"><span class="cl">ffff8252<span class="sb">`</span>8ba7c13c  ffce9f00
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0xffce9f00 &gt;&gt; <span class="m">4</span> : 0xfffffffffffce9f0                            <span class="p">;</span>Preserve Sign Extension
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; ? win32k!W32pServiceTableFilter + 0xfffffffffffce9f0
+</span></span><span class="line"><span class="cl">Evaluate expression: -138183934961440 <span class="o">=</span> ffff8252<span class="sb">`</span>8ba498e0
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; u ffff8252<span class="sb">`</span>8ba498e0
+</span></span><span class="line"><span class="cl">win32k!stub_UserPromotePointer:  &lt;---- Tablefilter points to stub
+</span></span><span class="line"><span class="cl"><span class="o">[</span>......<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">[</span>......<span class="o">]</span>
+</span></span></code></pre></div><p><img alt="alt text" loading="lazy" src="/posts/windows-syscall/image-19.png"></p>
+<p><strong>External References</strong></p>
+<ul>
+<li><a href="https://googleprojectzero.blogspot.com/2016/11/breaking-chain.html">https://googleprojectzero.blogspot.com/2016/11/breaking-chain.html</a></li>
+<li><a href="https://www.matteomalvica.com/minutes/windows_kernel/">https://www.matteomalvica.com/minutes/windows_kernel/</a></li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="http://localhost:1313/posts/dumpanalysis/">
+    <span class="title">Next »</span>
+    <br>
+    <span>Kernel Memory Dump Analysis : Introduction</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on x"
+            href="https://x.com/intent/tweet/?text=Windows%20Syscall&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f&amp;hashtags=">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f&amp;title=Windows%20Syscall&amp;summary=Windows%20Syscall&amp;source=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on reddit"
+            href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f&title=Windows%20Syscall">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on whatsapp"
+            href="https://api.whatsapp.com/send?text=Windows%20Syscall%20-%20http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on telegram"
+            href="https://telegram.me/share/url?text=Windows%20Syscall&amp;url=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Windows Syscall on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Windows%20Syscall&u=http%3a%2f%2flocalhost%3a1313%2fposts%2fwindows-syscall%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">5h4rrk </a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

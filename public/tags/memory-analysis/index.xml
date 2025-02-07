@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Memory Analysis on 5h4rrk </title>
+    <link>http://localhost:1313/tags/memory-analysis/</link>
+    <description>Recent content in Memory Analysis on 5h4rrk </description>
+    <generator>Hugo -- 0.131.0</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 07 Feb 2025 07:38:39 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/memory-analysis/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Application Crash Dump Analysis</title>
+      <link>http://localhost:1313/posts/application-crash-dump/</link>
+      <pubDate>Fri, 07 Feb 2025 07:38:39 +0530</pubDate>
+      <guid>http://localhost:1313/posts/application-crash-dump/</guid>
+      <description>This post explores application dumps, a crucial tool for debugging and analyzing software errors, offering insights into memory analysis and troubleshooting techniques</description>
+    </item>
+  </channel>
+</rss>
