@@ -3,7 +3,7 @@ title = 'Application Crash Dump Analysis'
 summary= 'This post explores application dumps, a crucial tool for debugging and analyzing software errors, offering insights into memory analysis and troubleshooting techniques'
 tags = ["Crash Dump", "Windows Troubleshooting", "Dump Analysis", "WinDbg", "Windows", "Application Errors", "Memory Analysis"]
 date = 2025-02-07T07:38:39+05:30
-draft = true
+draft = false
 +++
 
 
