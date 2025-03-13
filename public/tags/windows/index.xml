@@ -2,17 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Windows on 5h4rrk </title>
-    <link>https://5h4rrk.github.io/tags/windows/</link>
+    <link>http://localhost:1313/tags/windows/</link>
     <description>Recent content in Windows on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 30 Jan 2025 18:28:18 +0530</lastBuildDate>
-    <atom:link href="https://5h4rrk.github.io/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Feb 2025 07:38:39 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Application Crash Dump Analysis</title>
+      <link>http://localhost:1313/posts/application-crash-dump/</link>
+      <pubDate>Fri, 07 Feb 2025 07:38:39 +0530</pubDate>
+      <guid>http://localhost:1313/posts/application-crash-dump/</guid>
+      <description>This post explores application dumps, a crucial tool for debugging and analyzing software errors, offering insights into memory analysis and troubleshooting techniques</description>
+    </item>
     <item>
       <title>Kernel Memory Dump Analysis : Introduction</title>
-      <link>https://5h4rrk.github.io/posts/dumpanalysis/</link>
+      <link>http://localhost:1313/posts/dumpanalysis/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>https://5h4rrk.github.io/posts/dumpanalysis/</guid>
+      <guid>http://localhost:1313/posts/dumpanalysis/</guid>
       <description>An introduction to analyzing kernel memory dumps using WinDbg.</description>
     </item>
   </channel>

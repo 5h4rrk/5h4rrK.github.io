@@ -2,123 +2,145 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://5h4rrk.github.io/</loc>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/debugging/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/kernel-objects/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/reverse-engineering/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windows-internals/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/windows-objects/</loc>
+    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/application-crash-dump/</loc>
     <lastmod>2025-02-07T07:38:39+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/</loc>
+    <loc>http://localhost:1313/tags/application-errors/</loc>
     <lastmod>2025-02-07T07:38:39+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/digital-forensics/</loc>
+    <loc>http://localhost:1313/tags/crash-dump/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/dump-analysis/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/memory-analysis/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windbg/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windows/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windows-troubleshooting/</loc>
+    <lastmod>2025-02-07T07:38:39+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/digital-forensics/</loc>
     <lastmod>2025-01-30T18:28:18+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/dump-analysis/</loc>
+    <loc>http://localhost:1313/tags/kernel-dump/</loc>
     <lastmod>2025-01-30T18:28:18+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/kernel-dump/</loc>
+    <loc>http://localhost:1313/posts/dumpanalysis/</loc>
     <lastmod>2025-01-30T18:28:18+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/dumpanalysis/</loc>
+    <loc>http://localhost:1313/tags/memory-forensics/</loc>
     <lastmod>2025-01-30T18:28:18+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/memory-forensics/</loc>
-    <lastmod>2025-01-30T18:28:18+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/</loc>
-    <lastmod>2025-01-30T18:28:18+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windbg/</loc>
-    <lastmod>2025-01-30T18:28:18+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windows/</loc>
-    <lastmod>2025-01-30T18:28:18+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windows-troubleshooting/</loc>
-    <lastmod>2025-01-30T18:28:18+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/assembly/</loc>
+    <loc>http://localhost:1313/tags/assembly/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/debugging/</loc>
+    <loc>http://localhost:1313/tags/exploit-development/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/exploit-development/</loc>
+    <loc>http://localhost:1313/tags/low-level/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/low-level/</loc>
+    <loc>http://localhost:1313/tags/malware-analysis/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/malware-analysis/</loc>
+    <loc>http://localhost:1313/tags/windows-shellcode/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/reverse-engineering/</loc>
+    <loc>http://localhost:1313/posts/windows-shellcode2/</loc>
     <lastmod>2025-01-21T07:05:40+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/windows-internals/</loc>
-    <lastmod>2025-01-21T07:05:40+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/windows-shellcode/</loc>
-    <lastmod>2025-01-21T07:05:40+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/posts/windows-shellcode2/</loc>
-    <lastmod>2025-01-21T07:05:40+05:30</lastmod>
-  </url><url>
-    <loc>https://5h4rrk.github.io/posts/windows-shellcode/</loc>
+    <loc>http://localhost:1313/posts/windows-shellcode/</loc>
     <lastmod>2025-01-12T16:22:44+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/pe/</loc>
+    <loc>http://localhost:1313/tags/pe/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/pe-parsing/</loc>
+    <loc>http://localhost:1313/tags/pe-parsing/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/pe-parse-windbg2/</loc>
+    <loc>http://localhost:1313/posts/pe-parse-windbg2/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/portable-executable/</loc>
+    <loc>http://localhost:1313/tags/portable-executable/</loc>
     <lastmod>2025-01-12T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/pe-parse-windbg/</loc>
+    <loc>http://localhost:1313/categories/</loc>
+    <lastmod>2025-01-11T17:00:50+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/categories/debugging/</loc>
+    <lastmod>2025-01-11T17:00:50+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/pe-parse-windbg/pe-parse-windbg/</loc>
+    <lastmod>2025-01-11T17:00:50+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/pe-parse-windbg/</loc>
     <lastmod>2025-01-11T17:00:50+05:30</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/bi0sctf2024/</loc>
+    <loc>http://localhost:1313/tags/bi0sctf2024/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/categories/</loc>
+    <loc>http://localhost:1313/tags/file-system-analysis/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/file-system-analysis/</loc>
+    <loc>http://localhost:1313/tags/file-system-forensics/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/file-system-forensics/</loc>
+    <loc>http://localhost:1313/categories/forensics/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/categories/forensics/</loc>
+    <loc>http://localhost:1313/tags/log-analysis/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/log-analysis/</loc>
+    <loc>http://localhost:1313/posts/resilient-file-system/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/resilient-file-system/</loc>
+    <loc>http://localhost:1313/tags/refs/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/refs/</loc>
+    <loc>http://localhost:1313/tags/resilient-file-system/</loc>
     <lastmod>2024-03-08T07:51:58+00:00</lastmod>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/resilient-file-system/</loc>
-    <lastmod>2024-03-08T07:51:58+00:00</lastmod>
+    <loc>http://localhost:1313/tags/ctf/</loc>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/windbg-basics/</loc>
+    <loc>http://localhost:1313/tags/hid/</loc>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/ctf/</loc>
+    <loc>http://localhost:1313/tags/network-forensic/</loc>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/hid/</loc>
+    <loc>http://localhost:1313/posts/keyboard-pcap/</loc>
   </url><url>
-    <loc>https://5h4rrk.github.io/tags/network-forensic/</loc>
+    <loc>http://localhost:1313/series/</loc>
   </url><url>
-    <loc>https://5h4rrk.github.io/posts/keyboard-pcap/</loc>
-  </url><url>
-    <loc>https://5h4rrk.github.io/series/</loc>
-  </url><url>
-    <loc>https://5h4rrk.github.io/tags/usb/</loc>
+    <loc>http://localhost:1313/tags/usb/</loc>
   </url>
 </urlset>

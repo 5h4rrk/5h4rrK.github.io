@@ -2,45 +2,59 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>WinDbg on 5h4rrk </title>
-    <link>https://5h4rrk.github.io/tags/windbg/</link>
+    <link>http://localhost:1313/tags/windbg/</link>
     <description>Recent content in WinDbg on 5h4rrk </description>
     <generator>Hugo -- 0.131.0</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 30 Jan 2025 18:28:18 +0530</lastBuildDate>
-    <atom:link href="https://5h4rrk.github.io/tags/windbg/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 07 Feb 2025 07:38:39 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/windbg/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Application Crash Dump Analysis</title>
+      <link>http://localhost:1313/posts/application-crash-dump/</link>
+      <pubDate>Fri, 07 Feb 2025 07:38:39 +0530</pubDate>
+      <guid>http://localhost:1313/posts/application-crash-dump/</guid>
+      <description>This post explores application dumps, a crucial tool for debugging and analyzing software errors, offering insights into memory analysis and troubleshooting techniques</description>
+    </item>
     <item>
       <title>Kernel Memory Dump Analysis : Introduction</title>
-      <link>https://5h4rrk.github.io/posts/dumpanalysis/</link>
+      <link>http://localhost:1313/posts/dumpanalysis/</link>
       <pubDate>Thu, 30 Jan 2025 18:28:18 +0530</pubDate>
-      <guid>https://5h4rrk.github.io/posts/dumpanalysis/</guid>
+      <guid>http://localhost:1313/posts/dumpanalysis/</guid>
       <description>An introduction to analyzing kernel memory dumps using WinDbg.</description>
     </item>
     <item>
       <title>Windows Shellcode Development &amp; Debugging with WinDbg: A Hands-On Guide (Part 2)</title>
-      <link>https://5h4rrk.github.io/posts/windows-shellcode2/</link>
+      <link>http://localhost:1313/posts/windows-shellcode2/</link>
       <pubDate>Tue, 21 Jan 2025 07:05:40 +0530</pubDate>
-      <guid>https://5h4rrk.github.io/posts/windows-shellcode2/</guid>
+      <guid>http://localhost:1313/posts/windows-shellcode2/</guid>
       <description>A comprehensive guide to understanding and creating Windows shellcode from scratch for exploit development. This article includes practical insights into using WinDbg for effective debugging and analysis.</description>
     </item>
     <item>
       <title>Windows Shellcode Development &amp; Debugging with WinDbg: A Hands-On Guide (Part 1)</title>
-      <link>https://5h4rrk.github.io/posts/windows-shellcode/</link>
+      <link>http://localhost:1313/posts/windows-shellcode/</link>
       <pubDate>Sun, 12 Jan 2025 16:22:44 +0530</pubDate>
-      <guid>https://5h4rrk.github.io/posts/windows-shellcode/</guid>
+      <guid>http://localhost:1313/posts/windows-shellcode/</guid>
       <description>A comprehensive guide to understanding and creating Windows shellcode from scratch for exploit development. This article includes practical insights into using WinDbg for effective debugging and analysis.</description>
     </item>
     <item>
       <title>PE Parsing: A Step-by-Step Guide with WinDbg - Part 2</title>
-      <link>https://5h4rrk.github.io/posts/pe-parse-windbg2/</link>
+      <link>http://localhost:1313/posts/pe-parse-windbg2/</link>
       <pubDate>Sun, 12 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>https://5h4rrk.github.io/posts/pe-parse-windbg2/</guid>
+      <guid>http://localhost:1313/posts/pe-parse-windbg2/</guid>
       <description>Hands on parsing PE files with WinDbg and explore their structures for debugging and reverse engineering.</description>
     </item>
     <item>
+      <title>Decoding PE Files A Step-by-Step Guide with WinDbg - Part 1</title>
+      <link>http://localhost:1313/posts/pe-parse-windbg/pe-parse-windbg/</link>
+      <pubDate>Sat, 11 Jan 2025 17:00:50 +0000</pubDate>
+      <guid>http://localhost:1313/posts/pe-parse-windbg/pe-parse-windbg/</guid>
+      <description>Hands-on parsing PE files with WinDbg and exploring their structures for debugging and reverse engineering.</description>
+    </item>
+    <item>
       <title>PE Parsing: A Step-by-Step Guide with WinDbg - Part 1</title>
-      <link>https://5h4rrk.github.io/posts/pe-parse-windbg/</link>
+      <link>http://localhost:1313/posts/pe-parse-windbg/</link>
       <pubDate>Sat, 11 Jan 2025 17:00:50 +0530</pubDate>
-      <guid>https://5h4rrk.github.io/posts/pe-parse-windbg/</guid>
+      <guid>http://localhost:1313/posts/pe-parse-windbg/</guid>
       <description>Hands on parsing PE files with WinDbg and explore their structures for debugging and reverse engineering.</description>
     </item>
   </channel>
