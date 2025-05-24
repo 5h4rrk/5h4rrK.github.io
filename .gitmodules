@@ -4,3 +4,6 @@
 [submodule "themes/hugo-PaperMod-Catpuccin"]
 	path = themes/hugo-PaperMod-Catpuccin
 	url = https://github.com/5h4rrk/hugo-PaperMod.git
+[submodule "themes/hugo-theme-re-terminal"]
+	path = themes/hugo-theme-re-terminal
+	url = https://github.com/5h4rrk/hugo-theme-re-terminal
