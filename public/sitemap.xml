@@ -3,7 +3,28 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/bigpool/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/kernel-debugging/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/memory-management/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/windows-bigpools/windows-bigpools/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/windows-internals/</loc>
+    <lastmod>2025-05-30T08:02:59+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/debugging/</loc>
     <lastmod>2025-03-12T08:23:06+05:30</lastmod>
@@ -11,16 +32,7 @@
     <loc>http://localhost:1313/tags/kernel-objects/</loc>
     <lastmod>2025-03-12T08:23:06+05:30</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/reverse-engineering/</loc>
-    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
-    <lastmod>2025-03-12T08:23:06+05:30</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/windows-internals/</loc>
     <lastmod>2025-03-12T08:23:06+05:30</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/windows-objects/</loc>

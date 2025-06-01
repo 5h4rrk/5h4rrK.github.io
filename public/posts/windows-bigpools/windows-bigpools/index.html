@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  
+    <title>Windows Bigpools :: 5h4rrk </title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An overview of how the Windows Kernel handles large memory allocations using BigPools, including internal structures and debugging techniques." />
+<meta name="keywords" content="Windows BigPool, Windows memory allocation, paged pool, non-paged pool, kernel large allocations, MmBigPoolInformation, Poolmon, Windows Kernel memory" />
+
+  <meta name="robots" content="noodp" />
+
+<link rel="canonical" href="http://localhost:1313/posts/windows-bigpools/windows-bigpools/" />
+
+
+  
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="http://localhost:1313/styles.css">
+
+
+
+
+
+
+
+  <link rel="shortcut icon" href="http://localhost:1313/img/theme-colors/orange.png">
+  <link rel="apple-touch-icon" href="http://localhost:1313/img/theme-colors/orange.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Windows Bigpools">
+<meta property="og:description" content="An overview of how the Windows Kernel handles large memory allocations using BigPools, including internal structures and debugging techniques." />
+<meta property="og:url" content="http://localhost:1313/posts/windows-bigpools/windows-bigpools/" />
+<meta property="og:site_name" content="5h4rrk " />
+
+  
+  
+  <meta property="og:image" content="http://localhost:1313/">
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+
+
+  <meta property="article:published_time" content="2025-05-30 08:02:59 &#43;0530 IST" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+</head>
+<body class="orange">
+
+
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/posts">
+  <div class="logo">
+    shark.exe [0]
+  </div>
+</a>
+
+    </div>
+    
+      <ul class="menu menu--mobile">
+  <li class="menu__trigger">Menu&nbsp;▾</li>
+  <li>
+    <ul class="menu__dropdown">
+      
+        
+          <li><a href="/tags">Tags</a></li>
+        
+      
+      
+    </ul>
+  </li>
+</ul>
+
+    
+    
+  </div>
+  
+    <nav class="navigation-menu">
+  <ul class="navigation-menu__inner menu--desktop">
+    
+      
+        
+          <li><a href="/tags" >Tags</a></li>
+        
+      
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<article class="post">
+  <h1 class="post-title">
+    <a href="http://localhost:1313/posts/windows-bigpools/windows-bigpools/">Windows Bigpools</a>
+  </h1>
+  <div class="post-meta"><time class="post-date">2025-05-30</time>
+    
+</div>
+
+  
+    <span class="post-tags">
+      
+      #<a href="http://localhost:1313/tags/windows-internals/">Windows Internals</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/memory-management/">Memory Management</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/kernel-debugging/">Kernel Debugging</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/bigpool/">BigPool</a>&nbsp;
+      
+    </span>
+  
+  
+
+
+
+  
+
+  <div class="post-content"><div>
+        <p>PoolTag is a 4 bytes value (unsigned int value) present in the header (i.e. <code>POOL_HEADER</code>) .Microsoft creates pool tag mostly for debugging purposes. So, whenever Kernel creates any object in pool memory, it creates a <code>POOL_HEADER</code> which contains a <code>PoolTag</code> field which contains information regarding what kind of object is being created.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_HEADER 
+</span></span><span class="line"><span class="cl">   +0x000 PreviousSize     : Pos 0, <span class="m">8</span> Bits
+</span></span><span class="line"><span class="cl">   +0x000 PoolIndex        : Pos 8, <span class="m">8</span> Bits
+</span></span><span class="line"><span class="cl">   +0x002 BlockSize        : Pos 0, <span class="m">8</span> Bits
+</span></span><span class="line"><span class="cl">   +0x002 PoolType         : Pos 8, <span class="m">8</span> Bits
+</span></span><span class="line"><span class="cl">   +0x000 Ulong1           : Uint4B
+</span></span><span class="line"><span class="cl">   +0x004 PoolTag          : Uint4B
+</span></span><span class="line"><span class="cl">   +0x008 ProcessBilled    : Ptr64 _EPROCESS
+</span></span><span class="line"><span class="cl">   +0x008 AllocatorBackTraceIndex : Uint2B
+</span></span><span class="line"><span class="cl">   +0x00a PoolTagHash      : Uint2B
+</span></span></code></pre></div><p>Let&rsquo;s look at one of the running process, how it actually looks like</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; !process <span class="m">0</span> <span class="m">0</span> cmd.exe
+</span></span><span class="line"><span class="cl">PROCESS ffffc509bf28b080
+</span></span><span class="line"><span class="cl">    SessionId: <span class="m">1</span>  Cid: <span class="m">1164</span>    Peb: 72ce659000  ParentCid: <span class="m">1148</span>
+</span></span><span class="line"><span class="cl">    DirBase: 5e2bc002  ObjectTable: ffff99011473e500  HandleCount: 245.
+</span></span><span class="line"><span class="cl">    Image: cmd.exe
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_HEADER ffffc509bf28b000
+</span></span><span class="line"><span class="cl">   +0x000 PreviousSize     : 0y00000000 <span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x000 PoolIndex        : 0y00000000 <span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x002 BlockSize        : 0y11010000 <span class="o">(</span>0xd0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x002 PoolType         : 0y00000010 <span class="o">(</span>0x2<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x000 Ulong1           : 0x2d00000
+</span></span><span class="line"><span class="cl">   +0x004 PoolTag          : 0x636f7250
+</span></span><span class="line"><span class="cl">   +0x008 ProcessBilled    : <span class="o">(</span>null<span class="o">)</span> 
+</span></span><span class="line"><span class="cl">   +0x008 AllocatorBackTraceIndex : <span class="m">0</span>
+</span></span><span class="line"><span class="cl">   +0x00a PoolTagHash      : <span class="m">0</span>
+</span></span></code></pre></div><p><code>0x636f7250</code>: It&rsquo;s a little endian value. On changing it to ascii, <code>corP</code> -&gt; <code>Proc</code> which represents an process object.</p>
+<p>For more information  on different windows pool tags, please look at <a href="https://raw.githubusercontent.com/jjzhang166/windbgtool/refs/heads/master/Dependecies/x64/triage/pooltag.txt">pooltag.txt</a></p>
+<p>Windows Kernel groups similar size memory allocations together. If the requested size exceeds one page (0x1000)  bytes, the memory would be allocated from special pool i.e. big pool which is for large allocations.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_TRACKER_BIG_PAGES
+</span></span><span class="line"><span class="cl">   +0x000 Va               : Uint8B
+</span></span><span class="line"><span class="cl">   +0x008 Key              : Uint4B
+</span></span><span class="line"><span class="cl">   +0x00c Pattern          : Pos 0, <span class="m">8</span> Bits
+</span></span><span class="line"><span class="cl">   +0x00c PoolType         : Pos 8, <span class="m">12</span> Bits
+</span></span><span class="line"><span class="cl">   +0x00c SlushSize        : Pos 20, <span class="m">12</span> Bits
+</span></span><span class="line"><span class="cl">   +0x010 NumberOfBytes    : Uint8B
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; ?? sizeof<span class="o">(</span>nt!_POOL_TRACKER_BIG_PAGES<span class="o">)</span>
+</span></span><span class="line"><span class="cl">unsigned int64 0x18
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; x nt!PoolBigPageTable
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a68 nt!PoolBigPageTable <span class="o">=</span> &lt;no <span class="nb">type</span> information&gt;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; x nt!PoolBigPageTableSize
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee19290 nt!PoolBigPageTableSize <span class="o">=</span> &lt;no <span class="nb">type</span> information&gt;
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; db fffff805<span class="sb">`</span>4ee16a68
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a68  <span class="m">00</span> f0 e6 <span class="m">93</span> <span class="m">85</span> b5 ff ff-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a78  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">20</span> <span class="m">60</span> <span class="m">90</span> <span class="m">85</span> b5 ff ff  ......... <span class="sb">`</span>.....
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a88  <span class="m">00</span> <span class="m">80</span> <span class="m">18</span> bb <span class="m">80</span> d8 ff ff-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a98  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">BigPoolTableAddress
+</span></span><span class="line"><span class="cl">0: kd&gt; dps fffff805<span class="sb">`</span>4ee16a68 L1
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee16a68  ffffb585<span class="sb">`</span>93e6f000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">BigPoolTableSize
+</span></span><span class="line"><span class="cl">0: kd&gt; dps fffff805<span class="sb">`</span>4ee19290 L1
+</span></span><span class="line"><span class="cl">fffff805<span class="sb">`</span>4ee19290  00000000<span class="sb">`</span><span class="m">00004000</span>
+</span></span></code></pre></div><p>Memory Dump</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; db ffffb585<span class="sb">`</span>93e6f000
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f000  <span class="m">00</span> <span class="m">80</span> <span class="m">77</span> 5d <span class="m">06</span> c7 ff ff-4d 6d <span class="m">52</span> <span class="m">65</span> <span class="m">00</span> <span class="m">01</span> <span class="m">04</span> <span class="m">00</span>  ..w<span class="o">]</span>....MmRe....
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f010  <span class="m">00</span> <span class="m">80</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">70</span> 7f <span class="m">97</span> <span class="m">85</span> b5 ff ff  .........p......
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f020  <span class="m">73</span> 6d <span class="m">42</span> <span class="m">74</span> <span class="m">00</span> <span class="m">00</span> <span class="m">02</span> 00-00 <span class="m">10</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  smBt............
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f030  <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f040  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-01 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f050  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f060  <span class="m">00</span> <span class="m">40</span> df <span class="m">58</span> <span class="m">06</span> c7 ff ff-43 4d <span class="m">32</span> <span class="m">35</span> <span class="m">00</span> <span class="m">05</span> <span class="m">00</span> <span class="m">00</span>  .@.X....CM25....
+</span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f070  <span class="m">00</span> <span class="m">10</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">40</span> <span class="m">35</span> bc <span class="m">80</span> d8 ff ff  .........@5.....
+</span></span></code></pre></div><p>Script to Automate it</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_TRACKER_BIG_PAGES ffffb585<span class="sb">`</span>93e6f000
+</span></span><span class="line"><span class="cl">   +0x000 Va               : 0xffffc706<span class="sb">`</span>5d778000
+</span></span><span class="line"><span class="cl">   +0x008 Key              : 0x65526d4d
+</span></span><span class="line"><span class="cl">   +0x00c Pattern          : 0y00000000 <span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x00c PoolType         : 0y010000000001 <span class="o">(</span>0x401<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x00c SlushSize        : 0y000000000000 <span class="o">(</span>0<span class="o">)</span>
+</span></span><span class="line"><span class="cl">   +0x010 NumberOfBytes    : 0x8000
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">0: kd&gt; db 0xffffc706<span class="sb">`</span>5d778000
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778000  <span class="m">70</span> <span class="m">80</span> <span class="m">77</span> 5d <span class="m">06</span> c7 ff ff-81 <span class="m">50</span> f8 <span class="m">95</span> <span class="m">85</span> b5 ff ff  p.w<span class="o">]</span>.....P......
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778010  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778020  <span class="m">78</span> 8f <span class="m">77</span> 5d <span class="m">06</span> c7 ff ff-00 <span class="m">00</span> d5 5b <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  x.w<span class="o">]</span>.......<span class="o">[</span>....
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778030  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-e1 <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778040  4d <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">03</span> <span class="m">00</span> <span class="m">00</span> 00-0b <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  M...............
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778050  4c <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 d0 <span class="m">75</span> 5d <span class="m">06</span> c7 ff ff  L.........u<span class="o">]</span>....
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778060  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
+</span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778070  <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-78 8f <span class="m">77</span> 5d <span class="m">06</span> c7 ff ff  ........x.w<span class="o">]</span>....
+</span></span></code></pre></div><p>Let&rsquo;s write an WinDbg extension to parse the structures and display the information ( i.e. output would be very similar to <code>bigpools</code> plugin from volatility.)</p>
+<p><code>bigPools.js</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="s2">&#34;use strict&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">CreateFileLog</span><span class="p">(</span><span class="nx">f</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nx">host</span><span class="p">.</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">Debugger</span><span class="p">.</span><span class="nx">Utility</span><span class="p">.</span><span class="nx">FileSystem</span><span class="p">.</span><span class="nx">CreateTextWriter</span><span class="p">(</span><span class="nx">f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="nx">output_string</span><span class="p">,</span> <span class="nx">args</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">dlog</span><span class="p">(</span><span class="nx">output_string</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="s2">&#34;\n&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">PrintPoolEntries</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="nx">baseOffset</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">pattern</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">slushsize</span><span class="p">,</span> <span class="nx">numberOfBytes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">dlog</span><span class="p">(</span><span class="nx">baseOffset</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">pattern</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">slushsize</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="nx">numberOfBytes</span><span class="p">,</span> <span class="s2">&#34;\n&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">const</span> <span class="nx">PoolType</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPool</span><span class="o">:</span> <span class="mh">0x0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolExecute</span><span class="o">:</span> <span class="mh">0x0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">PagedPool</span><span class="o">:</span> <span class="mh">0x1</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolMustSucceed</span><span class="o">:</span> <span class="mh">0x2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">DontUseThisType</span><span class="o">:</span> <span class="mh">0x3</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolCacheAligned</span><span class="o">:</span> <span class="mh">0x4</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">PagedPoolCacheAligned</span><span class="o">:</span> <span class="mh">0x5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolCacheAlignedMustS</span><span class="o">:</span> <span class="mh">0x6</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">MaxPoolType</span><span class="o">:</span> <span class="mh">0x7</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolBase</span><span class="o">:</span> <span class="mh">0x0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolBaseMustSucceed</span><span class="o">:</span> <span class="mh">0x2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolBaseCacheAligned</span><span class="o">:</span> <span class="mh">0x4</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolBaseCacheAlignedMustS</span><span class="o">:</span> <span class="mh">0x6</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolSession</span><span class="o">:</span> <span class="mh">0x20</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">PagedPoolSession</span><span class="o">:</span> <span class="mh">0x21</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolMustSucceedSession</span><span class="o">:</span> <span class="mh">0x22</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">DontUseThisTypeSession</span><span class="o">:</span> <span class="mh">0x23</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolCacheAlignedSession</span><span class="o">:</span> <span class="mh">0x24</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">PagedPoolCacheAlignedSession</span><span class="o">:</span> <span class="mh">0x25</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolCacheAlignedMustSSession</span><span class="o">:</span> <span class="mh">0x26</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolNx</span><span class="o">:</span> <span class="mh">0x200</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolNxCacheAligned</span><span class="o">:</span> <span class="mh">0x204</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">NonPagedPoolSessionNx</span><span class="o">:</span> <span class="mh">0x220</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">DecodeBigPool</span><span class="p">(</span><span class="nx">baseAddress</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">dlog</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">debugLog</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">virtual_address</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">parseInt64</span><span class="p">(</span><span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">baseAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">key</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">parseInt64</span><span class="p">(</span><span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">baseAddress</span><span class="p">,</span> <span class="mh">0x3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)[</span><span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="nx">key</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kd">let</span> <span class="nx">value</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">parseInt64</span><span class="p">(</span><span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">baseAddress</span><span class="p">,</span> <span class="mh">0x4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)[</span><span class="mi">3</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="kd">let</span> <span class="nx">pattern</span> <span class="o">=</span> <span class="nx">value</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">;</span> <span class="c1">// Extract 8 bits
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="kd">let</span> <span class="nx">type</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x0f</span><span class="p">;</span> <span class="c1">// Extract bits 8-12
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      <span class="kd">let</span> <span class="nx">slushsize</span> <span class="o">=</span> <span class="p">(</span><span class="nx">value</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xff</span><span class="p">;</span> <span class="c1">// Extract bits 12-20
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">      <span class="kd">let</span> <span class="nx">NumberOfBytes</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">parseInt64</span><span class="p">(</span><span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">baseAddress</span><span class="p">,</span> <span class="mh">0x3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)[</span><span class="mi">2</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="nx">PrintPoolEntries</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span> <span class="nx">baseAddress</span> <span class="p">,</span><span class="nx">virtual_address</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">pattern</span><span class="p">,</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">slushsize</span><span class="p">,</span> <span class="nx">NumberOfBytes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">logfileName</span> <span class="o">=</span> <span class="s2">&#34;E:\\output.log&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">flog</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">file</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">temp</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">offset</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="kd">let</span> <span class="nx">fileObject</span> <span class="o">=</span> <span class="mi">0</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">CreateIfFileNotExists</span><span class="p">(</span><span class="nx">filePath</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">try</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">host</span><span class="p">.</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">Debugger</span><span class="p">.</span><span class="nx">Utility</span><span class="p">.</span><span class="nx">FileSystem</span><span class="p">.</span><span class="nx">FileExists</span><span class="p">(</span><span class="nx">filePath</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="sb">`File Not Found </span><span class="si">${</span><span class="nx">filePath</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">catch</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">fileObject</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">Debugger</span><span class="p">.</span><span class="nx">Utility</span><span class="p">.</span><span class="nx">FileSystem</span><span class="p">.</span><span class="nx">CreateFile</span><span class="p">(</span><span class="nx">filePath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">fileObject</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">Debugger</span><span class="p">.</span><span class="nx">Utility</span><span class="p">.</span><span class="nx">FileSystem</span><span class="p">.</span><span class="nx">OpenFile</span><span class="p">(</span><span class="nx">filePath</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">initializeScript</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nx">dlog</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">debugLog</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">dlog</span><span class="p">(</span><span class="s2">&#34;Initialized Script\n&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">      <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">apiVersionSupport</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">      <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">functionAlias</span><span class="p">(</span><span class="nx">PrintBigPoolTables</span><span class="p">,</span> <span class="s2">&#34;PringBigPoolTables&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">invokeScript</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">CreateIfFileNotExists</span><span class="p">(</span><span class="nx">logfileName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">PrintBigPoolTables</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">function</span> <span class="nx">PrintBigPoolTables</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">dlog</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">diagnostics</span><span class="p">.</span><span class="nx">debugLog</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTableAddress</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">getModuleSymbolAddress</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;nt&#34;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;PoolBigPageTable&#34;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTableSizeAddress</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">getModuleSymbolAddress</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;nt&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;PoolBigPageTableSize&#34;</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">  <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="s2">&#34;Pool Table Entries Address : &#34;</span><span class="p">,</span> <span class="nx">bigPoolTableAddress</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="s2">&#34;Big Pool Table Size :&#34;</span><span class="p">,</span> <span class="nx">bigPoolTableSizeAddress</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTable</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">bigPoolTableAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTableSize</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">bigPoolTableSizeAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span> <span class="s2">&#34;Big Pool Table Base Address : &#34;</span><span class="p">,</span><span class="nx">bigPoolTable</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span> <span class="s2">&#34;Big Pool Table Base Size : &#34;</span><span class="p">,</span><span class="nx">bigPoolTableSize</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">var</span> <span class="nx">ctl</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">namespace</span><span class="p">.</span><span class="nx">Debugger</span><span class="p">.</span><span class="nx">Utility</span><span class="p">.</span><span class="nx">Control</span><span class="p">;</span>   
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">PoolTrackerBigPagesSize</span> <span class="o">=</span> <span class="mh">0x18</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span> <span class="s2">&#34;Big Pool Table Size : &#34;</span><span class="p">,</span><span class="nx">PoolTrackerBigPagesSize</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nx">dlog</span><span class="p">(</span><span class="s2">&#34;BaseOffset&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;Offset&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;Key&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;Pattern&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;Type&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;SlushSize&#34;</span><span class="p">,</span> <span class="s2">&#34;\t\t&#34;</span><span class="p">,</span> <span class="s2">&#34;NumberOfBytes&#34;</span><span class="p">,</span> <span class="s2">&#34;\n&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nx">dlog</span><span class="p">(</span><span class="s2">&#34;-----------------------------------------------------------------------------------------\n&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">bigPoolTableSize</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">offset</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">host</span><span class="p">.</span><span class="nx">parseInt64</span><span class="p">(</span> <span class="nx">BigInt</span><span class="p">(</span><span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">bigPoolTableAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="kc">false</span><span class="p">))</span> <span class="o">+</span> <span class="nx">BigInt</span><span class="p">(</span><span class="nx">PoolTrackerBigPagesSize</span><span class="p">)</span> <span class="o">*</span> <span class="nx">BigInt</span><span class="p">(</span><span class="nx">idx</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">      <span class="nx">DecodeBigPool</span><span class="p">(</span><span class="nx">offset</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Run the script</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-js" data-lang="js"><span class="line"><span class="cl"><span class="mi">0</span><span class="o">:</span> <span class="nx">kd</span><span class="o">&gt;</span> <span class="p">.</span><span class="nx">scriptrun</span> <span class="nx">E</span><span class="o">:</span><span class="err">\</span><span class="nx">bigPools</span><span class="p">.</span><span class="nx">js</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Initialized</span> <span class="nx">Script</span>
+</span></span><span class="line"><span class="cl"><span class="nx">JavaScript</span> <span class="nx">script</span> <span class="nx">successfully</span> <span class="nx">loaded</span> <span class="nx">from</span> <span class="s1">&#39;E:\bigPools.js&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Entries</span> <span class="nx">Address</span> <span class="o">:</span> <span class="mh">0xfffff8054ee16a68</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Size</span> <span class="o">:</span><span class="mh">0xfffff8054ee19290</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Base</span> <span class="nx">Address</span> <span class="o">:</span> <span class="mh">0xffffb58593e6f000</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Base</span> <span class="nx">Size</span> <span class="o">:</span> <span class="mh">0x4000</span>
+</span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Size</span> <span class="o">:</span> <span class="mh">0x18</span>
+</span></span><span class="line"><span class="cl"><span class="nx">BaseOffset</span>				<span class="nx">Offset</span>					<span class="nx">Key</span>			<span class="nx">Pattern</span>	  <span class="nx">Type</span>	<span class="nx">SlushSize</span>	<span class="nx">NumberOfBytes</span>
+</span></span><span class="line"><span class="cl"><span class="o">------------------------------------------------------------------------------------------------------</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f000</span>		<span class="mh">0xffffc7065d778000</span>		<span class="nx">MmRe</span>		<span class="mi">0</span>		<span class="mi">1</span>		<span class="mi">64</span>		<span class="mh">0x8000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f018</span>		<span class="mh">0xffffb585977f7000</span>		<span class="nx">smBt</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">32</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f060</span>		<span class="mh">0xffffc70658df4000</span>		<span class="nx">CM25</span>		<span class="mi">0</span>		<span class="mi">5</span>		<span class="mi">0</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f078</span>		<span class="mh">0xffffd880bc354000</span>		<span class="nx">ConT</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">32</span>		<span class="mh">0x3000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f090</span>		<span class="mh">0xffffc70658932000</span>		<span class="nx">CM25</span>		<span class="mi">0</span>		<span class="mi">5</span>		<span class="mi">0</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f0a8</span>		<span class="mh">0xffffc706586d1000</span>		<span class="nx">CM25</span>		<span class="mi">0</span>		<span class="mi">5</span>		<span class="mi">0</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593e6f0c0</span>		<span class="mh">0xffffc70658b93000</span>		<span class="nx">CM25</span>		<span class="mi">0</span>		<span class="mi">5</span>		<span class="mi">0</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="p">....</span>
+</span></span><span class="line"><span class="cl"><span class="p">....</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593eceee0</span>		<span class="mh">0xffffc7065e165000</span>		<span class="nx">Vi25</span>		<span class="mi">0</span>		<span class="mi">1</span>		<span class="mi">0</span>		<span class="mh">0x3000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593eceef8</span>		<span class="mh">0xffffb585979c3001</span>		<span class="nx">smWw</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">32</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecef70</span>		<span class="mh">0xffffc7065b6ce000</span>		<span class="nx">CM16</span>		<span class="mi">0</span>		<span class="mi">1</span>		<span class="mi">0</span>		<span class="mh">0x1000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecef88</span>		<span class="mh">0xffffd880bc16e000</span>		<span class="nx">ConT</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">32</span>		<span class="mh">0x3000</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecefa0</span>		<span class="mh">0xffffc7065f6ce001</span>		<span class="nx">MmSt</span>		<span class="mi">0</span>		<span class="mi">1</span>		<span class="mi">0</span>		<span class="mh">0x2530</span>
+</span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecefe8</span>		<span class="mh">0xffffb585945a8001</span>		<span class="nx">Mmxx</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">96</span>		<span class="mh">0x1e000</span>
+</span></span></code></pre></div>
+      </div></div>
+
+  
+    
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h"></span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        
+        <span class="button next">
+            <a href="http://localhost:1313/posts/windows-objects/">
+                <span class="button__text">Windows Objects: Structure, Headers, and Internal Mechanics</span>
+                <span class="button__icon">→</span>
+            </a>
+        </span>
+        
+    </div>
+</div>
+
+  
+
+  
+    
+
+  
+</article>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright">
+        <span>© 2025 Powered by <a href="https://gohugo.io">Hugo</a></span>
+    
+      <span>:: <a href="https://github.com/mirus-ua/hugo-theme-re-terminal" target="_blank">Theme</a> made by <a href="https://github.com/mirus-ua" target="_blank">Mirus</a></span>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<script type="text/javascript" src="/bundle.min.js"></script>
+
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>
