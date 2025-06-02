@@ -137,7 +137,7 @@
   </h1>
   <div class="post-meta"><time class="post-date">2025-05-30</time>
     
-</div>
+<span class="post-reading-time">6 min read (1247 words)</span></div>
 
   
     <span class="post-tags">
@@ -227,8 +227,7 @@
 </span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f050  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
 </span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f060  <span class="m">00</span> <span class="m">40</span> df <span class="m">58</span> <span class="m">06</span> c7 ff ff-43 4d <span class="m">32</span> <span class="m">35</span> <span class="m">00</span> <span class="m">05</span> <span class="m">00</span> <span class="m">00</span>  .@.X....CM25....
 </span></span><span class="line"><span class="cl">ffffb585<span class="sb">`</span>93e6f070  <span class="m">00</span> <span class="m">10</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">40</span> <span class="m">35</span> bc <span class="m">80</span> d8 ff ff  .........@5.....
-</span></span></code></pre></div><p>Script to Automate it</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_TRACKER_BIG_PAGES ffffb585<span class="sb">`</span>93e6f000
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_POOL_TRACKER_BIG_PAGES ffffb585<span class="sb">`</span>93e6f000
 </span></span><span class="line"><span class="cl">   +0x000 Va               : 0xffffc706<span class="sb">`</span>5d778000
 </span></span><span class="line"><span class="cl">   +0x008 Key              : 0x65526d4d
 </span></span><span class="line"><span class="cl">   +0x00c Pattern          : 0y00000000 <span class="o">(</span>0<span class="o">)</span>
@@ -246,7 +245,7 @@
 </span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778050  4c <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 d0 <span class="m">75</span> 5d <span class="m">06</span> c7 ff ff  L.........u<span class="o">]</span>....
 </span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778060  <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-00 <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span>  ................
 </span></span><span class="line"><span class="cl">ffffc706<span class="sb">`</span>5d778070  <span class="m">01</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> <span class="m">00</span> 00-78 8f <span class="m">77</span> 5d <span class="m">06</span> c7 ff ff  ........x.w<span class="o">]</span>....
-</span></span></code></pre></div><p>Let&rsquo;s write an WinDbg extension to parse the structures and display the information ( i.e. output would be very similar to <code>bigpools</code> plugin from volatility.)</p>
+</span></span></code></pre></div><p>Let&rsquo;s write an WinDbg extension to parse the structures and display the information.</p>
 <p><code>bigPools.js</code></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-javascript" data-lang="javascript"><span class="line"><span class="cl"><span class="s2">&#34;use strict&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
@@ -356,7 +355,6 @@
 </span></span><span class="line"><span class="cl">  <span class="p">);</span>
 </span></span><span class="line"><span class="cl">  
 </span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="s2">&#34;Pool Table Entries Address : &#34;</span><span class="p">,</span> <span class="nx">bigPoolTableAddress</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">  <span class="nx">Print</span><span class="p">(</span><span class="nx">dlog</span><span class="p">,</span><span class="s2">&#34;Big Pool Table Size :&#34;</span><span class="p">,</span> <span class="nx">bigPoolTableSizeAddress</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTable</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">bigPoolTableAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">  <span class="kd">let</span> <span class="nx">bigPoolTableSize</span> <span class="o">=</span> <span class="nx">host</span><span class="p">.</span><span class="nx">memory</span><span class="p">.</span><span class="nx">readMemoryValues</span><span class="p">(</span><span class="nx">bigPoolTableSizeAddress</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
@@ -382,7 +380,6 @@
 </span></span><span class="line"><span class="cl"><span class="nx">Initialized</span> <span class="nx">Script</span>
 </span></span><span class="line"><span class="cl"><span class="nx">JavaScript</span> <span class="nx">script</span> <span class="nx">successfully</span> <span class="nx">loaded</span> <span class="nx">from</span> <span class="s1">&#39;E:\bigPools.js&#39;</span>
 </span></span><span class="line"><span class="cl"><span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Entries</span> <span class="nx">Address</span> <span class="o">:</span> <span class="mh">0xfffff8054ee16a68</span>
-</span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Size</span> <span class="o">:</span><span class="mh">0xfffff8054ee19290</span>
 </span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Base</span> <span class="nx">Address</span> <span class="o">:</span> <span class="mh">0xffffb58593e6f000</span>
 </span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Base</span> <span class="nx">Size</span> <span class="o">:</span> <span class="mh">0x4000</span>
 </span></span><span class="line"><span class="cl"><span class="nx">Big</span> <span class="nx">Pool</span> <span class="nx">Table</span> <span class="nx">Size</span> <span class="o">:</span> <span class="mh">0x18</span>
@@ -403,7 +400,10 @@
 </span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecef88</span>		<span class="mh">0xffffd880bc16e000</span>		<span class="nx">ConT</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">32</span>		<span class="mh">0x3000</span>
 </span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecefa0</span>		<span class="mh">0xffffc7065f6ce001</span>		<span class="nx">MmSt</span>		<span class="mi">0</span>		<span class="mi">1</span>		<span class="mi">0</span>		<span class="mh">0x2530</span>
 </span></span><span class="line"><span class="cl"><span class="mh">0xffffb58593ecefe8</span>		<span class="mh">0xffffb585945a8001</span>		<span class="nx">Mmxx</span>		<span class="mi">0</span>		<span class="mi">0</span>		<span class="mi">96</span>		<span class="mh">0x1e000</span>
-</span></span></code></pre></div>
+</span></span></code></pre></div><p>It saves the log file at the path. Check the log file for detailed analysis.</p>
+<p><img alt="alt text" src="image.png"></p>
+<img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif" width="240" height="240" alt="Heh">
+
       </div></div>
 
   
@@ -427,9 +427,6 @@
 </div>
 
   
-
-  
-    
 
   
 </article>

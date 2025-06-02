@@ -8,9 +8,8 @@ tags = ["Windows Internals", "Memory Management", "Kernel Debugging", "BigPool"]
 keywords = ["Windows BigPool", "Windows memory allocation", "paged pool", "non-paged pool", "kernel large allocations", "MmBigPoolInformation", "Poolmon", "Windows Kernel memory"]
 description = "An overview of how the Windows Kernel handles large memory allocations using BigPools, including internal structures and debugging techniques." 
 showFullContent = false
-readingTime = false
-hideComments = false
-color = "" #color from the theme settings
+readingTime = true
+hideComments = true
 +++
 
 
@@ -113,7 +112,6 @@ ffffb585`93e6f060  00 40 df 58 06 c7 ff ff-43 4d 32 35 00 05 00 00  .@.X....CM25
 ffffb585`93e6f070  00 10 00 00 00 00 00 00-00 40 35 bc 80 d8 ff ff  .........@5.....
 ```
 
-Script to Automate it 
 
 ```bash
 0: kd> dt nt!_POOL_TRACKER_BIG_PAGES ffffb585`93e6f000
@@ -136,7 +134,7 @@ ffffc706`5d778060  00 00 00 00 00 00 00 00-00 00 00 00 00 00 00 00  ............
 ffffc706`5d778070  01 00 00 00 00 00 00 00-78 8f 77 5d 06 c7 ff ff  ........x.w]....
 ```
 
-Let's write an WinDbg extension to parse the structures and display the information ( i.e. output would be very similar to `bigpools` plugin from volatility.)
+Let's write an WinDbg extension to parse the structures and display the information.
 
 `bigPools.js`
 
@@ -249,7 +247,6 @@ function PrintBigPoolTables() {
   );
   
   Print(dlog,"Pool Table Entries Address : ", bigPoolTableAddress);
-  Print(dlog,"Big Pool Table Size :", bigPoolTableSizeAddress);
 
   let bigPoolTable = host.memory.readMemoryValues(bigPoolTableAddress, 1, 8, false);
   let bigPoolTableSize = host.memory.readMemoryValues(bigPoolTableSizeAddress, 1, 8, false);
@@ -281,7 +278,6 @@ Run the script
 Initialized Script
 JavaScript script successfully loaded from 'E:\bigPools.js'
 Pool Table Entries Address : 0xfffff8054ee16a68
-Big Pool Table Size :0xfffff8054ee19290
 Big Pool Table Base Address : 0xffffb58593e6f000
 Big Pool Table Base Size : 0x4000
 Big Pool Table Size : 0x18
@@ -303,3 +299,11 @@ BaseOffset				Offset					Key			Pattern	  Type	SlushSize	NumberOfBytes
 0xffffb58593ecefa0		0xffffc7065f6ce001		MmSt		0		1		0		0x2530
 0xffffb58593ecefe8		0xffffb585945a8001		Mmxx		0		0		96		0x1e000
 ```
+
+It saves the log file at the path. Check the log file for detailed analysis.
+
+![alt text](image.png)
+
+
+<img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif" width="240" height="240" alt="Heh">
+
