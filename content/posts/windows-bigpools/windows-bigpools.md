@@ -302,8 +302,7 @@ BaseOffset				Offset					Key			Pattern	  Type	SlushSize	NumberOfBytes
 
 It saves the log file at the path. Check the log file for detailed analysis.
 
-![alt text](image.png)
+![alt text](images/image.png)
 
 
-<img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif" width="240" height="240" alt="Heh">
-
+![Heh](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif)
