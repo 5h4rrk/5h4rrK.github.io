@@ -14,9 +14,6 @@
 <link rel="canonical" href="http://localhost:1313/posts/windows-objects/" />
 
 
-  
-
-
 
 
 
@@ -360,46 +357,46 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define OB_FLAG_DELETED_INLINE          0x80 </span><span class="c1">// DeletedInline (Object in queue for deletion)
 </span></span></span></code></pre></div><h5 id="optional-objectheader">Optional ObjectHeader<a href="#optional-objectheader" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
 <table>
-<thead>
-<tr>
-<th>Optional Object Header</th>
-<th>(ObpInfoMaskToOffset)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>_OBJECT_HEADER_CREATOR_INFO</td>
-<td>0                    = 0x1</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_NAME_INFO</td>
-<td>InfoMask &amp; 0x3       = 0x2</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_HANDLE_INFO</td>
-<td>InfoMask &amp; 0x7       = 0x4</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_QUOTA_INFO</td>
-<td>InfoMask &amp; 0xF       = 0x8</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_PROCESS_INFO</td>
-<td>InfoMask &amp; 0x1F      = 0x10</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_AUDIT_INFO</td>
-<td>InfoMask &amp; 0x3F      = 0x20</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_EXTENDED_INFO</td>
-<td>InfoMask &amp; 0x7F      = 0x40</td>
-</tr>
-<tr>
-<td>_OBJECT_HEADER_PADDING_INFO</td>
-<td>InfoMask &amp; 0xFF      = 0x80</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>Optional Object Header</th>
+          <th>(ObpInfoMaskToOffset)</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>_OBJECT_HEADER_CREATOR_INFO</td>
+          <td>0                    = 0x1</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_NAME_INFO</td>
+          <td>InfoMask &amp; 0x3       = 0x2</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_HANDLE_INFO</td>
+          <td>InfoMask &amp; 0x7       = 0x4</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_QUOTA_INFO</td>
+          <td>InfoMask &amp; 0xF       = 0x8</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_PROCESS_INFO</td>
+          <td>InfoMask &amp; 0x1F      = 0x10</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_AUDIT_INFO</td>
+          <td>InfoMask &amp; 0x3F      = 0x20</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_EXTENDED_INFO</td>
+          <td>InfoMask &amp; 0x7F      = 0x40</td>
+      </tr>
+      <tr>
+          <td>_OBJECT_HEADER_PADDING_INFO</td>
+          <td>InfoMask &amp; 0xFF      = 0x80</td>
+      </tr>
+  </tbody>
 </table>
 <p>InfoMask : <code>0x88</code> -&gt; <strong>_OBJECT_HEADER_QUOTA_INFO</strong></p>
 <p><strong>Decoding InfoMask</strong></p>
@@ -526,7 +523,7 @@
 </span></span></code></pre></div><ul>
 <li>It&rsquo;s just for alignment of object body.</li>
 </ul>
-<p><img alt="alt text" src="/posts/windows-objects/image-3.png"></p>
+<p><img src="/posts/windows-objects/image-3.png" alt="alt text"></p>
 <h5 id="object_header-typeindex">OBJECT_HEADER TypeIndex<a href="#object_header-typeindex" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
 <p>In older versions of Windows,<code>Type</code> field used to point to <code>_OBJECT_TYPE</code> structure. Starting with Windows 7, <code>TypeIndex</code> field is introduced, which stores an encoded value. When decoded, it provides an index that is used to locate <code>_OBJECT_TYPE</code> structure within <code>ObTypeIndexTable</code> array.</p>
 <p>Now, Let&rsquo;s look into <strong>TypeIndex</strong></p>
@@ -785,7 +782,7 @@
 </ul>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0: kd&gt; dt nt!_OBJECT_HEADER_PADDING_INFO ffff938cd7e86080-30-4
 </span></span><span class="line"><span class="cl">   +0x000 PaddingAmount    : 0x30
-</span></span></code></pre></div><p><img alt="alt text" src="image-1.png"></p>
+</span></span></code></pre></div><p><img src="image-1.png" alt="alt text"></p>
 <p><strong>References</strong></p>
 <ul>
 <li>

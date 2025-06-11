@@ -14,9 +14,6 @@
 <link rel="canonical" href="http://localhost:1313/posts/keyboard-pcap/" />
 
 
-  
-
-
 
 
 
@@ -160,14 +157,14 @@
         <h2 id="network-keylogger">Network-KeyLogger<a href="#network-keylogger" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>Here is a small writeup for the Network-Logger Challenge from Srdnlen ctf.</p>
 <p>We are given a <strong>pcap</strong> file. On opening it in wireshark, we will find it is USB captured data.</p>
-<p><img alt="image" src="https://user-images.githubusercontent.com/89577007/196241863-62cd2ca3-3de4-4fbf-93ac-2399856a5fa2.png"></p>
+<p><img src="https://user-images.githubusercontent.com/89577007/196241863-62cd2ca3-3de4-4fbf-93ac-2399856a5fa2.png" alt="image"></p>
 <p>Following the packet <em><code>DESCRIPTOR Response DEVICE</code></em>, we will find basic information like idVendor,idProduct etc. about the connected devices.</p>
 <p><em>Operating System uses idVendor &amp; idProduct to determine a driver for the connected device.</em></p>
 <p>After analyzing few Leftover data, we are confirmed that It is about keyboard capture.</p>
 <p>The <code>URB_INTERRUPT_TRANSFER</code> structure is utilized by USB client drivers to transmit data. In this context, the pressed keys data is transferred from the keyboard (<code>source</code>) to the computer (<code>host</code>).</p>
 <p>To filter the data, we can use <code>usb.capdata</code> to get only leftover data.</p>
-<p><img alt="image" src="https://user-images.githubusercontent.com/89577007/196245183-00a142cd-09d2-4328-a2de-4fac8991e6d8.png"></p>
-<p><img alt="image" src="https://user-images.githubusercontent.com/89577007/196242698-c3a181f0-a300-4cd1-9de3-65c3822558bd.png"></p>
+<p><img src="https://user-images.githubusercontent.com/89577007/196245183-00a142cd-09d2-4328-a2de-4fac8991e6d8.png" alt="image"></p>
+<p><img src="https://user-images.githubusercontent.com/89577007/196242698-c3a181f0-a300-4cd1-9de3-65c3822558bd.png" alt="image"></p>
 <p><strong>0x02</strong>:  <code>Left Shift Modifier</code></p>
 <p><strong>0x20</strong>: <code>Right Shift Modifier</code></p>
 <p><strong>0x00</strong>: <code> Normal Key Pressed</code></p>

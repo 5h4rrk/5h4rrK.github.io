@@ -16,9 +16,6 @@ Disk Forensics Resilient File System Log Analysis " />
 <link rel="canonical" href="http://localhost:1313/posts/resilient-file-system/" />
 
 
-  
-
-
 
 
 
@@ -186,50 +183,44 @@ Disk Forensics Resilient File System Log Analysis " />
 <p><strong>List all directories that have been renamed, including their original names and the timestamps of when they were renamed.</strong></p>
 <blockquote>
 <p>TimeZone - UTC(+05:30) [YYYY-MM-DD HH:MM:SS.XX]
-Format - [ [&lsquo;OriginalDirName&rsquo;, &lsquo;RenamedDirName&rsquo;, &lsquo;TimeStamp&rsquo;] , .. ]</p>
-</blockquote>
+Format - [ [&lsquo;OriginalDirName&rsquo;, &lsquo;RenamedDirName&rsquo;, &lsquo;TimeStamp&rsquo;] , .. ]</p></blockquote>
 <h4 id="question-2"><strong>Question 2</strong><a href="#question-2" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <p><strong>Name all the deleted directories with deletion timestamps.</strong></p>
 <blockquote>
 <p>TimeZone : UTC(+05:30) [YYYY-MM-DD HH:MM:SS.XX]
-Format - [ [&lsquo;DirectoryName&rsquo; , &lsquo;TimeStamp&rsquo;] , .. ]</p>
-</blockquote>
+Format - [ [&lsquo;DirectoryName&rsquo; , &lsquo;TimeStamp&rsquo;] , .. ]</p></blockquote>
 <h4 id="question-3"><strong>Question 3</strong><a href="#question-3" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <p><strong>List all directories with their creation times, including originals if any that have been renamed or deleted.</strong></p>
 <blockquote>
 <p>TimeZone : UTC(+05:30) [YYYY-MM-DD HH:MM:SS.XX]
-Format - [ [&lsquo;DirectoryName&rsquo; , &lsquo;CreatedTime&rsquo;] , &hellip;. ]</p>
-</blockquote>
+Format - [ [&lsquo;DirectoryName&rsquo; , &lsquo;CreatedTime&rsquo;] , &hellip;. ]</p></blockquote>
 <h4 id="question-4"><strong>Question 4</strong><a href="#question-4" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <p><strong>Recover the files that have been deleted, and provide the md5sum of each recovered file.</strong></p>
 <blockquote>
-<p>Format - [ [&lsquo;file1hash&rsquo;] , [&lsquo;file2hash&rsquo;], &hellip; ]</p>
-</blockquote>
+<p>Format - [ [&lsquo;file1hash&rsquo;] , [&lsquo;file2hash&rsquo;], &hellip; ]</p></blockquote>
 <h4 id="question-5"><strong>Question 5</strong><a href="#question-5" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <p><strong>Identify all files that have been deleted (Simple + Permanent), including their deletion timestamps.</strong></p>
 <blockquote>
 <p>TimeZone : UTC(+05:30) [YYYY-MM-DD HH:MM:SS.XX]
-Format - [ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Permanent&rsquo; ] , .. ]</p>
-</blockquote>
+Format - [ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Permanent&rsquo; ] , .. ]</p></blockquote>
 <h4 id="question-6"><strong>Question 6</strong><a href="#question-6" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <p><strong>Restore all encrypted files, decrypt them, and provide the md5sum of each decrypted file after removing any extra bytes before computing the hash.</strong></p>
 <blockquote>
-<p>Format - [ [&lsquo;hash1&rsquo;] , [&lsquo;hash2&rsquo;], &lsquo;,..]</p>
-</blockquote>
+<p>Format - [ [&lsquo;hash1&rsquo;] , [&lsquo;hash2&rsquo;], &lsquo;,..]</p></blockquote>
 </details>
 <h1 id="solution">Solution<a href="#solution" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h1>
 <p>To address the corruption in the file system, we&rsquo;ll initiate the repair process by examining the file system using a Hex Editor. Since the Resilient File System (ReFS) is not widely supported by forensic tools, we&rsquo;ll rely on <a href="/posts/resilient-file-system/#References">research papers</a> for its structures.</p>
 <p>The most recent version of Active Disk Editor is capable of loading ReFS, so we can load the image and confirm its integrity.</p>
 <h2 id="overview-of-refs-structure">Overview of ReFS structure<a href="#overview-of-refs-structure" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-104.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-104.png" alt="AltText"></p>
 <p>The Volume Boot Record (VBR) serves as a reference to the <code>Superblock</code>, a crucial component. The <code>Superblock</code> references to child nodes known as <code>CheckPoint</code>.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-106.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-109.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-106.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-109.png" alt="AltText"></p>
 <p>Our initial step would be calculating the cluster size. Later on we need this for carving out the files</p>
 <p>Cluster Size = <code>BytesPerSector * SectorsPerCluster</code></p>
 <p>ClusterSize = 0x08 * 0x200  = <code>0x1000 (4KB)</code></p>
 <h3 id="superblock">SuperBlock<a href="#superblock" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-500.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-500.png" alt="alt text"></p>
 <ul>
 <li>
 <p>The file system includes three SuperBlocks: one at the start and two at the end.</p>
@@ -242,7 +233,7 @@ Format - [ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Pe
 </li>
 </ul>
 <h3 id="checkpoint">CheckPoint<a href="#checkpoint" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-501.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-501.png" alt="alt text"></p>
 <ul>
 <li>
 <p>The file system has two CheckPoints.</p>
@@ -307,29 +298,29 @@ Format - [ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Pe
 <ul>
 <li>Within the filesystem, there are three SuperBlocks and two Checkpoints. Fixing any one of these SuperBlocks and Checkpoints will resolve the issue at hand.</li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-101.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-101.png" alt="AltText"></p>
 <ul>
 <li>LCN1 : <code>0x1e</code></li>
 <li>Offset : 0x1e * 0x1000 = <strong>0x1e000</strong></li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-102.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-102.png" alt="AltText"></p>
 <ul>
 <li>LCN1 : <code>0x0f7ffd</code></li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-103.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-103.png" alt="AltText"></p>
 <ul>
 <li>LCN1 : <code>0x0f7ffe</code></li>
 </ul>
-<p><img alt="AltText" src="image100.png"></p>
+<p><img src="image100.png" alt="AltText"></p>
 <ul>
 <li>LCN1 : <code>0x27d0</code></li>
 </ul>
-<p><img alt="AltText" src="image.png"></p>
+<p><img src="image.png" alt="AltText"></p>
 <ul>
 <li>LCN1 : <code>0x01dc48</code></li>
 </ul>
 <p>Now, let&rsquo;s proceed by opening the file system image in Active Disk Editor.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-105.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-105.png" alt="AltText"></p>
 <h3 id="logfile">LogFile<a href="#logfile" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>A logfile is a metadata file that stores transactional data to facilitate the recovery of the file system to a consistent state in the event of system crashes and unexpected conditions</p>
 <ul>
@@ -350,35 +341,34 @@ Format - [ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Pe
 </li>
 </ul>
 <h3 id="refs-logfile-vs-ntfs-logfile">ReFS LogFile vs NTFS $LogFile<a href="#refs-logfile-vs-ntfs-logfile" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-502.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-502.png" alt="alt text"></p>
 <p><em>Fig : Redo Structure of ReFS</em></p>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-504.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-504.png" alt="alt text"></p>
 <p><em>Fig : Structure of Operation Record of NTFS $LogFile</em></p>
 <p>Read <a href="https://eudl.eu/pdf/10.1007/978-3-642-35515-8_18">Finding Forensic Information on Creating a Folder in $LogFile of NTFS </a></p>
 <p>Now, let&rsquo;s explore the structure of the ReFS LogFile in detail.</p>
 <h3 id="refs-logfile-structure">ReFS LogFile Structure<a href="#refs-logfile-structure" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-201.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-201.png" alt="AltText"></p>
 <h4 id="explanation">Explanation<a href="#explanation" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <h4 id="entry-header-and-log-record-header">Entry Header and Log Record Header<a href="#entry-header-and-log-record-header" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-204.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-204.png" alt="AltText"></p>
 <blockquote>
 <p>Red Bounded Area -&gt; <code>ReFS Entry Header</code>
-Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
-</blockquote>
+Green Bounded Area -&gt; <code>ReFS Log Header</code></p></blockquote>
 <h4 id="log-record">Log Record<a href="#log-record" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-207.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-207.png" alt="alt text"></p>
 <h4 id="redo-record-header">Redo Record Header<a href="#redo-record-header" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-208.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-208.png" alt="AltText"></p>
 <p>Redo Log Header Size : 0x38 bytes</p>
 <h4 id="redo-data-offset-array">Redo Data Offset Array<a href="#redo-data-offset-array" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-209.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-209.png" alt="AltText"></p>
 <p><code>Tail Offset</code> : <em>indicates ending of data offset array</em></p>
 <p><code>Tail Size</code>: <em>size of each transaction</em></p>
 <h4 id="redo-transactional-data">Redo Transactional Data<a href="#redo-transactional-data" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
 <h5 id="example-1">Example 1<a href="#example-1" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-210.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-210.png" alt="AltText"></p>
 <h5 id="example-2">Example 2<a href="#example-2" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-211.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-211.png" alt="AltText"></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="n">REFS_REDO_REC_HDR_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
 </span></span><span class="line"><span class="cl">    <span class="s1">&#39;redo_rec_size&#39;</span><span class="p">,</span> <span class="s1">&#39;opcode&#39;</span><span class="p">,</span> <span class="s1">&#39;tablekeys_count&#39;</span><span class="p">,</span> <span class="s1">&#39;tablekeys_offset&#39;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">    <span class="s1">&#39;value_count&#39;</span><span class="p">,</span> <span class="s1">&#39;value_offset&#39;</span><span class="p">,</span> <span class="s1">&#39;unknown1&#39;</span><span class="p">,</span>
@@ -422,9 +412,9 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">transaction</span>
 </span></span></code></pre></div><p><em>Source: <a href="https://github.com/horensic/ARIN">ARIN</a></em></p>
 <h5 id="example-3">Example 3<a href="#example-3" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-9.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-9.png" alt="alt text"></p>
 <h5 id="example-4-control-log-type">Example 4 (Control Log Type)<a href="#example-4-control-log-type" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
-<p><img alt="alt text" src="/posts/resilient-file-system/images/image-505.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-505.png" alt="alt text"></p>
 <p><em>Fig : Control Log Type</em></p>
 <h2 id="answers">Answers<a href="#answers" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <h4 id="extracting-log-files-from-the-file-system">Extracting Log Files from the File System<a href="#extracting-log-files-from-the-file-system" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
@@ -434,19 +424,18 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <li>List all directories that have been renamed, including their original names and the timestamps of when they were renamed.</li>
 </ol>
 <blockquote>
-<p><strong>Format :[ [&lsquo;OriginalDirName&rsquo;, &lsquo;RenamedDirName&rsquo;, TimeStamp] , .. ]</strong></p>
-</blockquote>
+<p><strong>Format :[ [&lsquo;OriginalDirName&rsquo;, &lsquo;RenamedDirName&rsquo;, TimeStamp] , .. ]</strong></p></blockquote>
 <p>To identify renamed directories in ReFS, search for the specific opcodes related to directory renaming. By examining consecutive MLog entries associated with these opcodes, we can reveal the timestamps indicating when the renaming occurred.</p>
 <p>To locate directories in the LogFile, search for the hexadecimal values <code>30 00 02 00</code>, which serve as prefixes for directory entries. Conversely, the value <code>30 00 01 00</code> typically indicates file entries. However, it&rsquo;s essential to note that there may be some false positives in the search results.</p>
 <ul>
 <li>File Prefix (from <a href="https://github.com/jamemanionda/ReFS_Detector">ReFS Detector</a>) : <code>30 01 00 00 80 01 00 00 00 00 00 00 30 00 01 00</code></li>
 </ul>
 <p>Directory Renamed Opcode : <strong><code>0x2 -&gt; 0x2 -&gt; 0x1 -&gt; 0x1 -&gt; 0x4</code></strong></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-38.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-39.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-38.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-39.png" alt="AltText"></p>
 <p>Timestamp will be found in next <code>MLog</code> page (starting with opcode <code>0x4</code>).</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-55.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-40.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-55.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-40.png" alt="AltText"></p>
 <p>The timestamp in the ReFS LogFile is in Little-Endian format. To convert it to UTC +5:30, we can use <a href="https://www.digital-detective.net/dcode/">DCode</a> tool.</p>
 <p><em>[&rsquo;e88e52cac&rsquo;, &lsquo;88077a4a1370&rsquo;, &lsquo;2024-02-18 13:10:20.49&rsquo;]</em></p>
 <p>We can write a script to automate the process.</p>
@@ -458,16 +447,15 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <li>Name all the deleted directories with deletion timestamps.</li>
 </ol>
 <blockquote>
-<p><strong>Format : [ [&lsquo;DirectoryName&rsquo; , &lsquo;TimeStamp&rsquo;] , .. ]</strong></p>
-</blockquote>
+<p><strong>Format : [ [&lsquo;DirectoryName&rsquo; , &lsquo;TimeStamp&rsquo;] , .. ]</strong></p></blockquote>
 <p>Deletions can occur in two ways: Simple and Permanent.</p>
 <p>Opcode for Permanent Deletion</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0x2 -&gt; 0xf -&gt; 0x2 -&gt; 0xf -&gt; 0x4 -&gt; 0x12
-</span></span></code></pre></div><p><img alt="AltText" src="/posts/resilient-file-system/images/image-44.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-41.png"></p>
+</span></span></code></pre></div><p><img src="/posts/resilient-file-system/images/image-44.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-41.png" alt="AltText"></p>
 <p>To find the remaining opcodes, you can search in the next <code>MLog</code> entries. The timestamp can be found in opcode <code>0x04</code>.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-42.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-43.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-42.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-43.png" alt="AltText"></p>
 <p><strong>Permanently Deleted Directories</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="p">[</span>
 </span></span><span class="line"><span class="cl">     <span class="p">[</span><span class="s1">&#39;f8f1c218f9&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-18 13:11:28.57&#39;</span><span class="p">],</span>
@@ -476,17 +464,17 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </span></span></code></pre></div><p>Simple Deleted Directory Opcode</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">P<span class="o">(</span>Directory Creation<span class="o">)</span> → 0x06 → 0x04 → 0x04 → 0x04 → 0x04 → 0x03 → 0x02 → 0x02 → 0x01 → 0x01 → 0x0e → 0x04 → 0x03 → 0x04 → 0x04 → 0x04 → 0x01 → 0x04 → 0x03 → 0x04 → 0x04 → 0x08
 </span></span></code></pre></div><p>After a directory is created, the opcode follows. It&rsquo;s important to note that directories created with names starting with <code>$</code> can be easily distinguished from other directory creations.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-45.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-213.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-50.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-52.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-48.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-46.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-47.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-45.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-213.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-50.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-52.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-48.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-46.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-47.png" alt="AltText"></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"> <span class="p">[</span><span class="s1">&#39;c062fb828&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-18 13:10:48.62&#39;</span><span class="p">]</span>
 </span></span></code></pre></div><p>Alternatively, another method to determine the deletion timestamp is by analyzing <code>$IXXXXX</code> entries.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-214.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-215.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-214.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-215.png" alt="AltText"></p>
 <p><strong>Final Ans</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="p">[</span>
 </span></span><span class="line"><span class="cl">     <span class="p">[</span><span class="s1">&#39;f8f1c218f9&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-18 13:11:28.57&#39;</span><span class="p">],</span>
@@ -499,16 +487,14 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <li>List all directories with their creation times, including renamed and deleted.</li>
 </ol>
 <blockquote>
-<p><strong>Note : If a directory was renamed, include its original name and creation time.</strong></p>
-</blockquote>
+<p><strong>Note : If a directory was renamed, include its original name and creation time.</strong></p></blockquote>
 <blockquote>
-<p><strong>Fomat : [ [&lsquo;DirectoryName&rsquo; , &lsquo;CreatedTime&rsquo;] , &hellip;. ]</strong></p>
-</blockquote>
+<p><strong>Fomat : [ [&lsquo;DirectoryName&rsquo; , &lsquo;CreatedTime&rsquo;] , &hellip;. ]</strong></p></blockquote>
 <p>Dir Creation</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0x00 → 0x00 → 0x04 → 0x10 → 0x01 → 0x01 → 0x01 → 0x0e → 0x03 → 0x04
-</span></span></code></pre></div><p><img alt="AltText" src="/posts/resilient-file-system/images/image-54.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-53.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-56.png"></p>
+</span></span></code></pre></div><p><img src="/posts/resilient-file-system/images/image-54.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-53.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-56.png" alt="AltText"></p>
 <p><strong><em>Final Ans</em></strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl">    <span class="p">[</span>
 </span></span><span class="line"><span class="cl">        <span class="p">[</span><span class="s1">&#39;de34f60ab&#39;</span><span class="p">,</span> <span class="s1">&#39;2024-02-18 13:06:59.22&#39;</span><span class="p">],</span>
@@ -524,12 +510,11 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <li>Recover the files that have been deleted, and provide the <strong>md5sum</strong> of each recovered file.</li>
 </ol>
 <blockquote>
-<p><strong>Format : [ [&lsquo;file1hash&rsquo;]&rsquo; , [&lsquo;file2hash2&rsquo;], &hellip; ]</strong></p>
-</blockquote>
+<p><strong>Format : [ [&lsquo;file1hash&rsquo;]&rsquo; , [&lsquo;file2hash2&rsquo;], &hellip; ]</strong></p></blockquote>
 <ul>
 <li>We can find files that are simply deleted.</li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-57.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-57.png" alt="AltText"></p>
 <ul>
 <li>
 <p><code>$IXXXXX</code> file has components like filename, fullpath , deletion time etc.</p>
@@ -538,9 +523,9 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <p><code>$RXXXXX</code> file contents can be recovered.</p>
 </li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-59.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-60.png"></p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-58.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-59.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-60.png" alt="AltText"></p>
+<p><img src="/posts/resilient-file-system/images/image-58.png" alt="AltText"></p>
 <ul>
 <li>
 <p>We can use the <strong>dd</strong> command to extract a file from an image file. We can also increase the extraction speed by adjusting the block size.</p>
@@ -572,16 +557,16 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </ol>
 <p>   <strong>Format :[ [ &lsquo;filename&rsquo; , &lsquo;TimeStamp&rsquo; , &lsquo;Simple/Permanent&rsquo; ] , .. ]</strong></p>
 <p><strong>Simple Deletion</strong>
-<img alt="AltText" src="/posts/resilient-file-system/images/image-63.png"></p>
+<img src="/posts/resilient-file-system/images/image-63.png" alt="AltText"></p>
 <p><strong>Permanent Deletion</strong>
-<img alt="AltText" src="/posts/resilient-file-system/images/image-62.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-61.png"></p>
+<img src="/posts/resilient-file-system/images/image-62.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-61.png" alt="AltText"></p>
 <p>simple-pass.txt</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-64.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-66.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-67.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-64.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-66.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-67.png" alt="AltText"></p>
 <p>TimeStamp</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-68.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-68.png" alt="AltText"></p>
 <p><em>2024-02-18 13:15:00.51</em></p>
 <p>In the same manner, examine the log file and we will find the other simple deleted files</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[</span>
@@ -591,8 +576,8 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </span></span><span class="line"><span class="cl"><span class="p">]</span>
 </span></span></code></pre></div><p><strong>Permanent Deleted File Opcode</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">0x0f -&gt; 0x02 -&gt; 0x0f -&gt; 0x02 -&gt; 0x04
-</span></span></code></pre></div><p><img alt="AltText" src="/posts/resilient-file-system/images/image-69.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-70.png"></p>
+</span></span></code></pre></div><p><img src="/posts/resilient-file-system/images/image-69.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-70.png" alt="AltText"></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="o">(</span><span class="s1">&#39;ead47cb&#39;</span>,<span class="s1">&#39;2024-02-18 13:19:26.69&#39;</span>,<span class="s1">&#39;Permanent&#39;</span><span class="o">)</span>
 </span></span><span class="line"><span class="cl"><span class="o">(</span><span class="s1">&#39;essay.txt&#39;</span>,<span class="s1">&#39;2024-02-18 13:18:22.47&#39;</span>,<span class="s1">&#39;Permanent&#39;</span><span class="o">)</span>
 </span></span></code></pre></div><p><strong><em>Final Ans</em></strong></p>
@@ -608,8 +593,7 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <li>Restore all encrypted files, decrypt them, and provide the <strong>md5sum</strong> of each decrypted file after removing any extra bytes before computing the hash.</li>
 </ol>
 <blockquote>
-<p><strong>Format :[[&lsquo;hash1&rsquo;], [&lsquo;hash2&rsquo;],..]</strong></p>
-</blockquote>
+<p><strong>Format :[[&lsquo;hash1&rsquo;], [&lsquo;hash2&rsquo;],..]</strong></p></blockquote>
 <h5 id="an-overview-on-time_updateexe">An Overview on time_update.exe<a href="#an-overview-on-time_updateexe" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
 <hr>
 <ol>
@@ -635,14 +619,14 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <p>Before exiting, restore the system time to its initial state.</p>
 </li>
 </ol>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-216.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-217.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-218.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-219.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-220.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-221.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-222.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-223.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-216.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-217.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-218.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-219.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-220.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-221.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-222.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-223.png" alt="AltText"></p>
 <h5 id="file-decryption">File-Decryption<a href="#file-decryption" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
 <ul>
 <li>
@@ -660,8 +644,7 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </ul>
 <p>Because it updates the time before encrypting the files, it leaves a trace in the log files that could potentially be used to recover key.</p>
 <blockquote>
-<p>Opcode for Renamed File : <strong><code>0x02 → 0x05 → 0x01 → 0x04 → 0x04</code></strong></p>
-</blockquote>
+<p>Opcode for Renamed File : <strong><code>0x02 → 0x05 → 0x01 → 0x04 → 0x04</code></strong></p></blockquote>
 <ul>
 <li>
 <p>Let&rsquo;s manually search for the required information. We&rsquo;ll begin by assigning filenames with the extension <code>tort</code> and then conduct a search within the log file.</p>
@@ -673,22 +656,21 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <p>After locating it, we&rsquo;ll parse the data and examine the previous MLog to find the corresponding filenames.</p>
 </li>
 </ul>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-600.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-1.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-2.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-3.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-600.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-1.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-2.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-3.png" alt="AltText"></p>
 <p>First Rename : <em><code>15005-39026.pdf -&gt; bf2f63b3</code></em></p>
 <p>Search for the <em><code>bf2f63b3</code></em>.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-5.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-6.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-7.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-5.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-6.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-7.png" alt="AltText"></p>
 <p>Second Rename : <em><code>bf2f6b3 -&gt; 0cf51fbc</code></em></p>
 <blockquote>
-<p>The system time is expressed in Coordinated Universal Time (UTC).</p>
-</blockquote>
+<p>The system time is expressed in Coordinated Universal Time (UTC).</p></blockquote>
 <p>Rename Time(Encryption Key) : <em><code>2010-02-26 12:38:43.0000000 </code></em></p>
 <pre tabindex="0"><code>Enc Key Time : 2010 2 2 26 12 38 43 0
-</code></pre><p><img alt="AltText" src="/posts/resilient-file-system/images/image-8.png"></p>
+</code></pre><p><img src="/posts/resilient-file-system/images/image-8.png" alt="AltText"></p>
 <p>Third Rename : <em><code>0cf51fbc -&gt; 0cf51fbc.tort</code></em></p>
 <p>Similarly, locate the timestamps used for encryption on all remaining files, and then proceed to extract those files accordingly.</p>
 <p><code>binary-01.gif -&gt; c7982ef6 -&gt; a917438f -&gt; a917438f.tort</code> : <strong>1995 2 2 27 2 11 42 0</strong></p>
@@ -699,58 +681,50 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <p><code>ySq12b0T.mp4 -&gt; 86c66c9c -&gt; 185c65f8 -&gt; 185c65f8.tort</code> : <strong>2007 7 2 28 3 27 33 0</strong></p>
 <p><code>vl36hkjkzbh91.png -&gt; 313feb6e -&gt; cc876a3b -&gt; cc876a3b.tort</code> : <strong>1985 3 2 4 16 23 53 0</strong></p>
 <hr>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-224.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-224.png" alt="AltText"></p>
 <h5 id="carving-out-files">Carving Out Files<a href="#carving-out-files" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h5>
 <blockquote>
-<p>0cf51fbc.tort</p>
-</blockquote>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-20.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-21.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-22.png"></p>
+<p>0cf51fbc.tort</p></blockquote>
+<p><img src="/posts/resilient-file-system/images/image-20.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-21.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-22.png" alt="AltText"></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x10e94000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x16c000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>0cf51fbc_1.tort
 </span></span><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x11001000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x141000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>0cf51fbc_2.tort
 </span></span><span class="line"><span class="cl">cat 0cf51fbc_1.tort 0cf51fbc_2.tort &gt; 0cf51fbc.tort
 </span></span></code></pre></div><blockquote>
-<p>a917438f.tort</p>
-</blockquote>
+<p>a917438f.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x10025000<span class="o">)/</span><span class="m">64</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x89ce40<span class="o">)/</span><span class="m">64</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">64</span> <span class="nv">of</span><span class="o">=</span>a917438f.tort
 </span></span></code></pre></div><p>Remove the extra bytes from the extracted files present due to the block size used during extraction.</p>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-28.png"></p>
+<p><img src="/posts/resilient-file-system/images/image-28.png" alt="AltText"></p>
 <hr>
 <blockquote>
-<p>7a6c7166.tort</p>
-</blockquote>
-<p><img alt="AltText" src="/posts/resilient-file-system/images/image-30.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-29.png">
-<img alt="AltText" src="/posts/resilient-file-system/images/image-32.png"></p>
+<p>7a6c7166.tort</p></blockquote>
+<p><img src="/posts/resilient-file-system/images/image-30.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-29.png" alt="AltText">
+<img src="/posts/resilient-file-system/images/image-32.png" alt="AltText"></p>
 <p>Go to offset <code>0x108c2000</code>, <code>0x10c05000</code> &amp; read <code>830 * 0x1000</code> ,<code>130 * 0x1000</code>bytes respectively</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"> dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x108c2000<span class="o">)/</span><span class="m">8192</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">830</span> <span class="o">*</span> <span class="m">0</span>x1000<span class="o">)/</span><span class="m">8192</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">8192</span> <span class="nv">of</span><span class="o">=</span>7a6c7166_1.tort
 </span></span><span class="line"><span class="cl"> dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x10c05000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">130</span> <span class="o">*</span> <span class="m">0</span>x1000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>7a6c7166_2.tort
 </span></span><span class="line"><span class="cl"> cat 7a6c7166_1.tort 7a6c7166_2.tort &gt; 7a6c7166.tort
 </span></span></code></pre></div><hr>
 <blockquote>
-<p>185c65f8.tort</p>
-</blockquote>
+<p>185c65f8.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">68743</span> <span class="o">*</span> <span class="m">0</span>x1000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">525</span> <span class="o">*</span> <span class="m">0</span>x1000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>185c65f8.tort
 </span></span></code></pre></div><hr>
 <blockquote>
-<p>24819686.tort</p>
-</blockquote>
+<p>24819686.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x12800000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x10000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>24819686.tort
 </span></span></code></pre></div><hr>
 <blockquote>
-<p>3a7fab71.tort</p>
-</blockquote>
+<p>3a7fab71.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x10000000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x25000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>3a7fab71.tort
 </span></span></code></pre></div><hr>
 <blockquote>
-<p>bb292337.tort</p>
-</blockquote>
+<p>bb292337.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x13a00000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x8000<span class="o">)/</span><span class="m">4096</span><span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">4096</span> <span class="nv">of</span><span class="o">=</span>bb292337.tort
 </span></span></code></pre></div><hr>
 <blockquote>
-<p>cc876a3b.tort</p>
-</blockquote>
+<p>cc876a3b.tort</p></blockquote>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dd <span class="k">if</span><span class="o">=</span>ReAL_File_System.001 <span class="nv">skip</span><span class="o">=</span><span class="k">$((</span><span class="o">(</span><span class="m">0</span>x1000 <span class="o">*</span> <span class="m">72705</span><span class="k">))</span><span class="o">)</span> <span class="nv">count</span><span class="o">=</span><span class="k">$((</span><span class="m">0</span>x175f<span class="k">))</span>  <span class="nv">bs</span><span class="o">=</span><span class="m">1</span> <span class="nv">of</span><span class="o">=</span>cc876a3b.tort
 </span></span></code></pre></div><p>We can write a script to remove the extra bytes from the extracted files.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">struct</span>
@@ -943,7 +917,7 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </span></span><span class="line"><span class="cl">        <span class="n">key2</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">key1</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">        <span class="n">dec</span> <span class="o">=</span> <span class="n">w</span><span class="p">(</span><span class="n">encbuff</span><span class="o">=</span><span class="n">enc_buff</span><span class="p">,</span> <span class="n">key1</span><span class="o">=</span> <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="o">=</span> <span class="n">key2</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">        <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;decrypted/</span><span class="si">{</span><span class="n">dec_files</span><span class="p">[</span><span class="n">_</span><span class="p">]</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dec</span><span class="p">)</span>
-</span></span></code></pre></div><p><img alt="AltText" src="/posts/resilient-file-system/images/image-37.png"></p>
+</span></span></code></pre></div><p><img src="/posts/resilient-file-system/images/image-37.png" alt="AltText"></p>
 <p>Let&rsquo;s calculate md5sum of each file</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">da8ed3e98eb5a2ba769ea60b48b0f6eb  15005-39026.pdf
 </span></span><span class="line"><span class="cl">d58621ce6e560ba1c045892aef0b5f8b  binary-01.gif
@@ -953,7 +927,7 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 </span></span><span class="line"><span class="cl">111fb8624db9365af79e6ec446b00eac  stuffs.rar
 </span></span><span class="line"><span class="cl">76675928a19bcc5602ef81c7a833d3fa  vl36hkjkzbh91.png
 </span></span><span class="line"><span class="cl">4d9c5a006c4315625c86d94a8fd9fd2e  ySq12b0T.mp4
-</span></span></code></pre></div><p><img alt="alt text" src="/posts/resilient-file-system/images/image-506.png"></p>
+</span></span></code></pre></div><p><img src="/posts/resilient-file-system/images/image-506.png" alt="alt text"></p>
 <p><strong>Final Ans</strong></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="p">[</span>
 </span></span><span class="line"><span class="cl">  <span class="p">[</span><span class="s1">&#39;da8ed3e98eb5a2ba769ea60b48b0f6eb&#39;</span><span class="p">],</span>
@@ -969,13 +943,13 @@ Green Bounded Area -&gt; <code>ReFS Log Header</code></p>
 <h2 id="references">References<a href="#references" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <ul>
 <li>
-<p><a href="https://www.sciencedirect.com/science/article/pii/S2666281723001191?ref=pdf_download&fr=RR-2&rr=857d87e5a8047866">Deletion Pattern in ReFS</a></p>
+<p><a href="https://www.sciencedirect.com/science/article/pii/S2666281723001191?ref=pdf_download&amp;fr=RR-2&amp;rr=857d87e5a8047866">Deletion Pattern in ReFS</a></p>
 </li>
 <li>
-<p><a href="https://www.sciencedirect.com/science/article/pii/S2666281721000342?ref=pdf_download&fr=RR-2&rr=857d87e5a8037866">Forensic Analysis of ReFS Journaling</a></p>
+<p><a href="https://www.sciencedirect.com/science/article/pii/S2666281721000342?ref=pdf_download&amp;fr=RR-2&amp;rr=857d87e5a8037866">Forensic Analysis of ReFS Journaling</a></p>
 </li>
 <li>
-<p><a href="https://www.sciencedirect.com/science/article/pii/S1742287619301252?ref=pdf_download&fr=RR-2&rr=858e699298bd7868">Reverse Engineering of ReFS</a></p>
+<p><a href="https://www.sciencedirect.com/science/article/pii/S1742287619301252?ref=pdf_download&amp;fr=RR-2&amp;rr=858e699298bd7868">Reverse Engineering of ReFS</a></p>
 </li>
 <li>
 <p><a href="https://github.com/horensic/ARIN">Awesome ReFS Investigation tool</a></p>

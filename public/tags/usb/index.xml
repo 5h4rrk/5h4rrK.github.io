@@ -16,14 +16,14 @@
       <content>&lt;h2 id=&#34;network-keylogger&#34;&gt;Network-KeyLogger&lt;/h2&gt;
 &lt;p&gt;Here is a small writeup for the Network-Logger Challenge from Srdnlen ctf.&lt;/p&gt;
 &lt;p&gt;We are given a &lt;strong&gt;pcap&lt;/strong&gt; file. On opening it in wireshark, we will find it is USB captured data.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;image&#34; src=&#34;https://user-images.githubusercontent.com/89577007/196241863-62cd2ca3-3de4-4fbf-93ac-2399856a5fa2.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://user-images.githubusercontent.com/89577007/196241863-62cd2ca3-3de4-4fbf-93ac-2399856a5fa2.png&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Following the packet &lt;em&gt;&lt;code&gt;DESCRIPTOR Response DEVICE&lt;/code&gt;&lt;/em&gt;, we will find basic information like idVendor,idProduct etc. about the connected devices.&lt;/p&gt;
 &lt;p&gt;&lt;em&gt;Operating System uses idVendor &amp;amp; idProduct to determine a driver for the connected device.&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;After analyzing few Leftover data, we are confirmed that It is about keyboard capture.&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;URB_INTERRUPT_TRANSFER&lt;/code&gt; structure is utilized by USB client drivers to transmit data. In this context, the pressed keys data is transferred from the keyboard (&lt;code&gt;source&lt;/code&gt;) to the computer (&lt;code&gt;host&lt;/code&gt;).&lt;/p&gt;
 &lt;p&gt;To filter the data, we can use &lt;code&gt;usb.capdata&lt;/code&gt; to get only leftover data.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;image&#34; src=&#34;https://user-images.githubusercontent.com/89577007/196245183-00a142cd-09d2-4328-a2de-4fac8991e6d8.png&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;image&#34; src=&#34;https://user-images.githubusercontent.com/89577007/196242698-c3a181f0-a300-4cd1-9de3-65c3822558bd.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://user-images.githubusercontent.com/89577007/196245183-00a142cd-09d2-4328-a2de-4fac8991e6d8.png&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://user-images.githubusercontent.com/89577007/196242698-c3a181f0-a300-4cd1-9de3-65c3822558bd.png&#34; alt=&#34;image&#34;&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;0x02&lt;/strong&gt;:  &lt;code&gt;Left Shift Modifier&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;0x20&lt;/strong&gt;: &lt;code&gt;Right Shift Modifier&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;0x00&lt;/strong&gt;: &lt;code&gt; Normal Key Pressed&lt;/code&gt;&lt;/p&gt;

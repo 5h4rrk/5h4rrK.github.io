@@ -146,7 +146,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;00007ff8&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;4d6381a5  &lt;span class=&#34;s2&#34;&gt;&amp;#34;NTDLL.RtlAcquireSRWLockExclusive&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;00007ff8&lt;span class=&#34;sb&#34;&gt;`&lt;/span&gt;4d6381c5  &lt;span class=&#34;s2&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Here&amp;rsquo;s a screenshot from &lt;code&gt;objdump&lt;/code&gt; to verify that our implementation is correct:&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;http://localhost:1313/posts/windows-shellcode2/image-3.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/posts/windows-shellcode2/image-3.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
 &lt;p&gt;We can use this to confirm that the steps we&amp;rsquo;ve taken are accurate.&lt;/p&gt;
 &lt;h2 id=&#34;resolving-api&#34;&gt;Resolving API&lt;/h2&gt;
 &lt;h3 id=&#34;techniques&#34;&gt;Techniques&lt;/h3&gt;
@@ -319,7 +319,7 @@
 &lt;/ul&gt;
 &lt;p&gt;Load the script&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;$&amp;gt;&amp;lt;D:&lt;span class=&#34;se&#34;&gt;\r&lt;/span&gt;un.wds
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;http://localhost:1313/posts/windows-shellcode2/image.png&#34;&gt;&lt;/p&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;http://localhost:1313/posts/windows-shellcode2/image.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
 &lt;p&gt;:)&lt;/p&gt;
 </content>
     </item>

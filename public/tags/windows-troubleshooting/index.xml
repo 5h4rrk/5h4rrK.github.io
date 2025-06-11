@@ -103,7 +103,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;ProcDump is now &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; as the Just-in-time &lt;span class=&#34;o&#34;&gt;(&lt;/span&gt;AeDebug&lt;span class=&#34;o&#34;&gt;)&lt;/span&gt; debugger.
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Install and set the dump path to &lt;code&gt;E:\Codes\DebugApplication\Dumps&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;or it can be changed through Registry&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;http://localhost:1313/posts/application-crash-dump/image-1.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://localhost:1313/posts/application-crash-dump/image-1.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Compile and Run it. Upon program termination due to an unhandled exception, a core dump  will be automatically saved to disk.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; ╰─λ ls
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;DebugApplication.exe_250205_084645.dmp  DebugApplication.exe_250205_084646.dmp
@@ -507,7 +507,7 @@ NumberParameters: 0
 
 Local Machine Name QUACK (QUACK\heysa)
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Opening the DUMP file in Hex Editor &lt;a href=&#34;https://github.com/WerWolv/ImHex&#34;&gt;ImHex&lt;/a&gt; to analyze its contents. ImHex has collection of various pattern files that could be useful for understanding file structures and patterns.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;image.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;computer-name&#34;&gt;Computer Name&lt;/h4&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;!cn&lt;/code&gt;: Displays Computer Name&lt;/li&gt;

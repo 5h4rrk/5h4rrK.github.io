@@ -13,8 +13,18 @@
       <pubDate>Fri, 30 May 2025 08:02:59 +0530</pubDate>
       
       <guid>http://localhost:1313/posts/windows-bigpools/windows-bigpools/</guid>
-      <description>PoolTag is a 4 bytes value (unsigned int value) present in the header (i.e. POOL_HEADER) .Microsoft creates pool tag mostly for debugging purposes. So, whenever Kernel creates any object in pool memory, it creates a POOL_HEADER which contains a PoolTag field which contains information regarding what kind of object is being created.
-0: kd&amp;gt; dt nt!_POOL_HEADER +0x000 PreviousSize : Pos 0, 8 Bits +0x000 PoolIndex : Pos 8, 8 Bits +0x002 BlockSize : Pos 0, 8 Bits +0x002 PoolType : Pos 8, 8 Bits +0x000 Ulong1 : Uint4B +0x004 PoolTag : Uint4B +0x008 ProcessBilled : Ptr64 _EPROCESS +0x008 AllocatorBackTraceIndex : Uint2B +0x00a PoolTagHash : Uint2B Let&amp;rsquo;s look at one of the running process, how it actually looks like</description>
+      <description>&lt;p&gt;PoolTag is a 4 bytes value (unsigned int value) present in the header (i.e. &lt;code&gt;POOL_HEADER&lt;/code&gt;) .Microsoft creates pool tag mostly for debugging purposes. So, whenever Kernel creates any object in pool memory, it creates a &lt;code&gt;POOL_HEADER&lt;/code&gt; which contains a &lt;code&gt;PoolTag&lt;/code&gt; field which contains information regarding what kind of object is being created.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0: kd&amp;gt; dt nt!_POOL_HEADER 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x000 PreviousSize     : Pos 0, &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; Bits
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x000 PoolIndex        : Pos 8, &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; Bits
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x002 BlockSize        : Pos 0, &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; Bits
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x002 PoolType         : Pos 8, &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; Bits
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x000 Ulong1           : Uint4B
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x004 PoolTag          : Uint4B
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x008 ProcessBilled    : Ptr64 _EPROCESS
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x008 AllocatorBackTraceIndex : Uint2B
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x00a PoolTagHash      : Uint2B
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Let&amp;rsquo;s look at one of the running process, how it actually looks like&lt;/p&gt;</description>
       <content>&lt;p&gt;PoolTag is a 4 bytes value (unsigned int value) present in the header (i.e. &lt;code&gt;POOL_HEADER&lt;/code&gt;) .Microsoft creates pool tag mostly for debugging purposes. So, whenever Kernel creates any object in pool memory, it creates a &lt;code&gt;POOL_HEADER&lt;/code&gt; which contains a &lt;code&gt;PoolTag&lt;/code&gt; field which contains information regarding what kind of object is being created.&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0: kd&amp;gt; dt nt!_POOL_HEADER 
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;   +0x000 PreviousSize     : Pos 0, &lt;span class=&#34;m&#34;&gt;8&lt;/span&gt; Bits
@@ -257,8 +267,8 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;mh&#34;&gt;0xffffb58593ecefa0&lt;/span&gt;		&lt;span class=&#34;mh&#34;&gt;0xffffc7065f6ce001&lt;/span&gt;		&lt;span class=&#34;nx&#34;&gt;MmSt&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;		&lt;span class=&#34;mh&#34;&gt;0x2530&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;mh&#34;&gt;0xffffb58593ecefe8&lt;/span&gt;		&lt;span class=&#34;mh&#34;&gt;0xffffb585945a8001&lt;/span&gt;		&lt;span class=&#34;nx&#34;&gt;Mmxx&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;0&lt;/span&gt;		&lt;span class=&#34;mi&#34;&gt;96&lt;/span&gt;		&lt;span class=&#34;mh&#34;&gt;0x1e000&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;It saves the log file at the path. Check the log file for detailed analysis.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;images/image.png&#34;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;Heh&#34; src=&#34;https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;images/image.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZnh5enpseHVncGMxM3BjcmFwY2ZnejM0c2s4b3Y2anczODN2bGJ6ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/FWAcpJsFT9mvrv0e7a/giphy.gif&#34; alt=&#34;Heh&#34;&gt;&lt;/p&gt;
 </content>
     </item>
     

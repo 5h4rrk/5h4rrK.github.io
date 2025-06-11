@@ -101,7 +101,7 @@ NumberParameters: 0
 
 Local Machine Name QUACK (QUACK\heysa)
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Opening the DUMP file in Hex Editor &lt;a href=&#34;https://github.com/WerWolv/ImHex&#34;&gt;ImHex&lt;/a&gt; to analyze its contents. ImHex has collection of various pattern files that could be useful for understanding file structures and patterns.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;alt text&#34; src=&#34;image.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;image.png&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;
 &lt;h4 id=&#34;computer-name&#34;&gt;Computer Name&lt;/h4&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;!cn&lt;/code&gt;: Displays Computer Name&lt;/li&gt;
