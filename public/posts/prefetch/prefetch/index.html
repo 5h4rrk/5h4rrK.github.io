@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  
+    <title>Prefetch Files :: 5h4rrk </title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="An analysis of Windows Prefetch files, their structure, forensic significance, and decompression process." />
+<meta name="keywords" content="" />
+
+  <meta name="robots" content="noodp" />
+
+<link rel="canonical" href="http://localhost:1313/posts/prefetch/prefetch/" />
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="http://localhost:1313/styles.css">
+
+
+
+
+
+
+
+  <link rel="shortcut icon" href="http://localhost:1313/img/theme-colors/orange.png">
+  <link rel="apple-touch-icon" href="http://localhost:1313/img/theme-colors/orange.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Prefetch Files">
+<meta property="og:description" content="An analysis of Windows Prefetch files, their structure, forensic significance, and decompression process." />
+<meta property="og:url" content="http://localhost:1313/posts/prefetch/prefetch/" />
+<meta property="og:site_name" content="5h4rrk " />
+
+  
+    <meta property="og:image" content="http://localhost:1313/img/favicon/orange.png">
+  
+
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+
+
+  <meta property="article:published_time" content="2025-06-12 09:54:09 &#43;0530 IST" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+</head>
+<body class="orange">
+
+
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/posts">
+  <div class="logo">
+    shark.exe [0]
+  </div>
+</a>
+
+    </div>
+    
+      <ul class="menu menu--mobile">
+  <li class="menu__trigger">Menu&nbsp;▾</li>
+  <li>
+    <ul class="menu__dropdown">
+      
+        
+          <li><a href="/tags">Tags</a></li>
+        
+      
+      
+    </ul>
+  </li>
+</ul>
+
+    
+    
+  </div>
+  
+    <nav class="navigation-menu">
+  <ul class="navigation-menu__inner menu--desktop">
+    
+      
+        
+          <li><a href="/tags" >Tags</a></li>
+        
+      
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<article class="post">
+  <h1 class="post-title">
+    <a href="http://localhost:1313/posts/prefetch/prefetch/">Prefetch Files</a>
+  </h1>
+  <div class="post-meta"><time class="post-date">2025-06-12</time><span class="post-author">5h4rrk</span>
+    
+</div>
+
+  
+    <span class="post-tags">
+      
+      #<a href="http://localhost:1313/tags/windows-prefetch/">Windows Prefetch</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/windows-forensics/">Windows Forensics</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/digital-forensics/">Digital Forensics</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/prefetch-file-analysis/">Prefetch File Analysis</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/prefetch-parser/">Prefetch Parser</a>&nbsp;
+      
+      #<a href="http://localhost:1313/tags/windows-performance/">Windows Performance</a>&nbsp;
+      
+    </span>
+  
+  
+
+
+
+  
+
+  <div class="post-content"><div>
+        <h1 id="prefetch-files">Prefetch Files<a href="#prefetch-files" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h1>
+<p>Prefetch files are created by Windows to speed up the loading process by caching the neccessary data. When we fire up a process, it will cache the details like files accessed and stores it in small file i.e. prefetch files under <code>Prefetch</code> subfolder in <code>Windows</code>. When the application is opened for the next time, it will load the files accessed. Windows Prefetch files are located in <code>C:\Windows\Prefetch\*.pf</code>. From forensic perspective, it provides various valuable information like</p>
+<ul>
+<li>Executable Name</li>
+<li>Full Executable Path</li>
+<li>Execution Count</li>
+<li>Last Run Time</li>
+<li>TimeStamp (when executed i.e. Last 8 timestamps)</li>
+<li>MACB Time</li>
+<li>Executable Path Hash</li>
+<li>Volume Information</li>
+<li>Files accessed</li>
+<li>Directories accessed</li>
+</ul>
+<p><img src="/posts/prefetch/image-1.png" alt="Prefetch"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">prefetch_settings</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="mi">0</span><span class="p">:</span> <span class="s2">&#34;Prefetch-Disabled&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mi">1</span><span class="p">:</span> <span class="s2">&#34;Application-Prefetch-Enabled&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mi">2</span><span class="p">:</span> <span class="s2">&#34;Boot-Prefetch-Enabled&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="mi">3</span><span class="p">:</span> <span class="s2">&#34;Application-Boot-Prefetch-Enabled&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><ul>
+<li>Maximum Number of Prefetch files
+<ul>
+<li><strong>WindowsXP-Windows7</strong>: 128 files</li>
+<li><strong>Windows8-Windows11</strong>: 1024 files</li>
+</ul>
+</li>
+</ul>
+<h2 id="prefetch-file-structure">Prefetch File Structure<a href="#prefetch-file-structure" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Windows Prefetch files are compressed and stored in <code>.pf</code> format. To obtain the information, we need to decompress it first.</p>
+<h3 id="compressed-format">Compressed Format<a href="#compressed-format" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<ul>
+<li>Compressed Header ( 0x4 bytes)</li>
+<li>Uncompressed Size ( 0x4 bytes)</li>
+<li>CRC32             ( 0x4 bytes) // Optional</li>
+<li>Compressed buffer</li>
+</ul>
+<p>Compressed Header: <code>0x4D414D04</code> (<code>MAM\x04</code>)</p>
+<p>CRC32 is an optional either it will present or absent.</p>
+<h4 id="overview-of-compressed-prefetch-file">Overview of Compressed Prefetch file<a href="#overview-of-compressed-prefetch-file" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<div style="display: flex; gap: 10px; align-items: center;">
+  <div>
+    <p><strong>Without CRC32</strong></p>
+    <a href="/posts/prefetch/image.png" target="_blank" rel="noopener">
+      <img src="/posts/prefetch/image.png" alt="PrefetchFileStructure1" width="400"/>
+    </a>
+  </div>
+  <div>
+    <p><strong>With CRC32</strong></p>
+    <a href="/posts/prefetch/image-2.png" target="_blank" rel="noopener">
+      <img src="/posts/prefetch/image-2.png" alt="PrefetchFileStructure2" width="400"/>
+    </a>
+  </div>
+</div>
+<h4 id="decompressing-it">Decompressing It<a href="#decompressing-it" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p><code>PrefetchDecompress.cpp</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// PrefetchDecompress.cpp : This file contains the &#39;main&#39; function. Program
+</span></span></span><span class="line"><span class="cl"><span class="c1">// execution begins and ends there.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;Windows.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;winternl.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="n">import</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define COMPRESSION_FORMAT_NONE (0x0000)        </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_FORMAT_DEFAULT (0x0001)     </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_FORMAT_LZNT1 (0x0002)       </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_FORMAT_XPRESS (0x0003)      </span><span class="c1">// winint
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_FORMAT_XPRESS_HUFF (0x0004) </span><span class="c1">// winint
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_ENGINE_STANDARD (0x0000)    </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_ENGINE_MAXIMUM (0x0100)     </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#define COMPRESSION_ENGINE_HIBER (0x0200)       </span><span class="c1">// winnt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">ULONG32</span> <span class="n">u32</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">ULONG64</span> <span class="n">u64</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="n">UCHAR</span> <span class="n">u8</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">u32</span> <span class="n">signature</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">u32</span> <span class="n">size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">BYTE</span><span class="o">*</span> <span class="n">compressedPayload</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">BYTE</span><span class="o">*</span> <span class="n">payloadPtr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="n">COMPRESSED_PREFETCH</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">NTSTATUS</span><span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">RtlGetCompressionWorkSpaceSize_t</span><span class="p">)(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">USHORT</span> <span class="n">CompressionFormatAndEngine</span><span class="p">,</span> <span class="n">PULONG</span> <span class="n">CompressBufferWorkSpaceSize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PULONG</span> <span class="n">CompressFragmentWorkSpaceSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">typedef</span> <span class="nf">NTSTATUS</span><span class="p">(</span><span class="n">WINAPI</span> <span class="o">*</span><span class="n">RtlDecompressBufferEx_t</span><span class="p">)(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">USHORT</span> <span class="n">CompressionFormat</span><span class="p">,</span> <span class="n">PUCHAR</span> <span class="n">UncompressedBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">UncompressedBufferSize</span><span class="p">,</span> <span class="n">PUCHAR</span> <span class="n">CompressedBuffer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">CompressedBufferSize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">PULONG</span> <span class="n">FinalCompressedSize</span><span class="p">,</span> <span class="n">PVOID</span> <span class="n">WorkSpace</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">CleanUp</span><span class="p">(</span><span class="n">HMODULE</span> <span class="n">hNtdll</span><span class="p">,</span> <span class="n">HANDLE</span> <span class="n">hFile</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">hFile</span> <span class="o">&amp;&amp;</span> <span class="n">hFile</span> <span class="o">!=</span> <span class="n">INVALID_HANDLE_VALUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CloseHandle</span><span class="p">(</span><span class="n">hFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">InitPrefetchBuff</span><span class="p">(</span><span class="n">COMPRESSED_PREFETCH</span> <span class="o">*</span><span class="n">prefetch</span><span class="p">,</span> <span class="n">SIZE_T</span> <span class="n">req_size</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">compressedPayload</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span> <span class="o">*</span><span class="p">)</span><span class="nf">VirtualAlloc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">nullptr</span><span class="p">,</span> <span class="mh">0x00100000</span><span class="p">,</span> <span class="n">MEM_COMMIT</span> <span class="o">|</span> <span class="n">MEM_RESERVE</span><span class="p">,</span> <span class="n">PAGE_EXECUTE_READWRITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">payloadPtr</span> <span class="o">=</span> <span class="p">(</span><span class="n">BYTE</span><span class="o">*</span><span class="p">)</span> <span class="nf">VirtualAlloc</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">nullptr</span><span class="p">,</span> <span class="mh">0x00100000</span><span class="p">,</span> <span class="n">MEM_COMMIT</span> <span class="o">|</span> <span class="n">MEM_RESERVE</span><span class="p">,</span> <span class="n">PAGE_EXECUTE_READWRITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">compressedPayload</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[-] Failed to allocate buffer&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">payloadPtr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[-] Failed to allocate buffer&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">CleanPrefetch</span><span class="p">(</span><span class="n">COMPRESSED_PREFETCH</span><span class="o">*</span> <span class="n">prefetch</span><span class="p">,</span> <span class="n">SIZE_T</span> <span class="n">size</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">size</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">signature</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">VirtualFree</span><span class="p">(</span><span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">payloadPtr</span><span class="p">,</span> <span class="mh">0x00100000</span><span class="p">,</span> <span class="n">MEM_DECOMMIT</span> <span class="o">|</span> <span class="n">MEM_FREE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">VirtualFree</span><span class="p">(</span><span class="n">prefetch</span><span class="o">-&gt;</span><span class="n">compressedPayload</span><span class="p">,</span> <span class="mh">0x00100000</span><span class="p">,</span> <span class="n">MEM_DECOMMIT</span> <span class="o">|</span> <span class="n">MEM_FREE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[+] Windows Prefetch &#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">HANDLE</span> <span class="n">hFile</span> <span class="o">=</span> <span class="nf">CreateFileA</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">R</span><span class="s">&#34;(E:</span><span class="se">\f</span><span class="s">iles\Wireshark.pf)&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">GENERIC_READ</span><span class="p">,</span> <span class="n">FILE_SHARE_READ</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">,</span> <span class="n">OPEN_EXISTING</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">hFile</span> <span class="o">==</span> <span class="n">INVALID_HANDLE_VALUE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[?] Failed To Open File with ErrorCode {}&#34;</span><span class="p">,</span> <span class="nf">GetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">GetLastError</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ULONG</span> <span class="n">CompressBufferWorkSpaceSize</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ULONG</span> <span class="n">CompressFragmentWorkSpaceSize</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Load the library
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="n">HMODULE</span> <span class="n">hNtdll</span> <span class="o">=</span> <span class="nf">GetModuleHandleA</span><span class="p">(</span><span class="s">&#34;ntdll.dll&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">hNtdll</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Unable to Obtain handle&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CloseHandle</span><span class="p">(</span><span class="o">&amp;</span><span class="n">hFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">GetLastError</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">RtlGetCompressionWorkSpaceSizeFuncPtr</span> <span class="o">=</span> <span class="p">(</span><span class="n">RtlGetCompressionWorkSpaceSize_t</span><span class="p">)</span> <span class="nf">GetProcAddress</span><span class="p">(</span><span class="n">hNtdll</span><span class="p">,</span> <span class="s">&#34;RtlGetCompressionWorkSpaceSize&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">RtlDecompressBufferExPtr</span> <span class="o">=</span> <span class="p">(</span><span class="n">RtlDecompressBufferEx_t</span><span class="p">)</span> <span class="nf">GetProcAddress</span><span class="p">(</span><span class="n">hNtdll</span><span class="p">,</span> <span class="s">&#34;RtlDecompressBufferEx&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">((</span><span class="n">u64</span><span class="p">)</span><span class="n">RtlGetCompressionWorkSpaceSizeFuncPtr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Unable to resolve RtlGetCompressionWorkSpaceSize&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CleanUp</span><span class="p">(</span><span class="n">hNtdll</span><span class="p">,</span> <span class="n">hFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">GetLastError</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">((</span><span class="n">u64</span><span class="p">)</span><span class="n">RtlDecompressBufferExPtr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Unable to resolve RtlDecompressBufferEx&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CleanUp</span><span class="p">(</span><span class="n">hNtdll</span><span class="p">,</span> <span class="n">hFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">GetLastError</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[OFFSET] RtlGetCompressionWorkSpaceSize @ {:#x} &#34;</span><span class="p">,(</span><span class="n">u64</span><span class="p">)</span><span class="n">RtlGetCompressionWorkSpaceSizeFuncPtr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[OFFSET] RtlDecompressBufferExPtr @ {:#x} &#34;</span><span class="p">,(</span><span class="n">u64</span><span class="p">)</span><span class="n">RtlDecompressBufferExPtr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">NTSTATUS</span> <span class="n">status</span> <span class="o">=</span> <span class="nf">RtlGetCompressionWorkSpaceSizeFuncPtr</span><span class="p">(</span> <span class="n">COMPRESSION_FORMAT_XPRESS_HUFF</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CompressBufferWorkSpaceSize</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CompressFragmentWorkSpaceSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="mh">0x0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[+] Success: </span><span class="se">\n\t</span><span class="s">CompressBufferWorkSpaceSize = {:#x}</span><span class="se">\n\t</span><span class="s">CompressFragmentWorkSpaceSize = {:#x}&#34;</span><span class="p">,(</span><span class="n">u64</span><span class="p">)</span><span class="n">CompressBufferWorkSpaceSize</span><span class="p">,</span> <span class="p">(</span><span class="n">u64</span><span class="p">)</span><span class="n">CompressFragmentWorkSpaceSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">COMPRESSED_PREFETCH</span> <span class="n">prefetch</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ULONG</span> <span class="n">bytesRead</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">u32</span> <span class="n">sig</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">u32</span> <span class="n">size</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">u64</span> <span class="n">CompressedSize</span> <span class="o">=</span> <span class="p">(</span><span class="n">u64</span><span class="p">)</span><span class="nf">GetFileSize</span><span class="p">(</span><span class="n">hFile</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">)</span> <span class="o">-</span> <span class="mh">0x8</span><span class="p">;</span> <span class="c1">// TotalFileSize - HeaderSize
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="nf">ReadFile</span><span class="p">(</span><span class="n">hFile</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sig</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">UINT32</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">bytesRead</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ReadFile</span><span class="p">(</span><span class="n">hFile</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">UINT32</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">bytesRead</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">prefetch</span><span class="p">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">prefetch</span><span class="p">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">sig</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="nf">InitPrefetchBuff</span><span class="p">(</span><span class="o">&amp;</span><span class="n">prefetch</span><span class="p">,</span> <span class="n">CompressBufferWorkSpaceSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">BOOL</span> <span class="n">flag</span> <span class="o">=</span> <span class="nf">ReadFile</span><span class="p">(</span><span class="n">hFile</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">compressedPayload</span><span class="p">,</span> <span class="n">CompressBufferWorkSpaceSize</span> <span class="o">-</span> <span class="mi">8</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesRead</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">==</span> <span class="mh">0x0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;File Read Failed Error Code {:#x}&#34;</span><span class="p">,</span> <span class="nf">GetLastError</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Signature {:#x}&#34;</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">signature</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Decompressed Size {:#x}&#34;</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">size</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Compressed Size {:#x}&#34;</span><span class="p">,</span> <span class="n">CompressedSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">// Decompressing
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">ULONG</span> <span class="n">FinalUncompressedSize</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">PVOID</span> <span class="n">workspace</span> <span class="o">=</span> <span class="nf">VirtualAlloc</span><span class="p">(</span><span class="n">nullptr</span><span class="p">,</span> <span class="n">CompressBufferWorkSpaceSize</span><span class="p">,</span> <span class="n">MEM_COMMIT</span> <span class="o">|</span> <span class="n">MEM_RESERVE</span><span class="p">,</span> <span class="n">PAGE_READWRITE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">workspace</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;[-] Failed to allocate workspace&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">CleanUp</span><span class="p">(</span><span class="n">hNtdll</span><span class="p">,</span> <span class="n">hFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nf">GetLastError</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">  <span class="n">NTSTATUS</span> <span class="n">decompress_flag</span> <span class="o">=</span> <span class="nf">RtlDecompressBufferExPtr</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">COMPRESSION_FORMAT_XPRESS_HUFF</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">payloadPtr</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">size</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">compressedPayload</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">CompressedSize</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">FinalUncompressedSize</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">workspace</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">decompress_flag</span> <span class="o">==</span> <span class="mh">0x0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Decompressed Successfully !&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">HANDLE</span> <span class="n">hDecomFile</span> <span class="o">=</span> <span class="nf">CreateFileA</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">R</span><span class="s">&#34;(E:</span><span class="se">\f</span><span class="s">iles\Wireshark_decompressed.pf)&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">GENERIC_WRITE</span><span class="p">,</span> <span class="mh">0x0</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">,</span> <span class="n">CREATE_ALWAYS</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">      <span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span> <span class="n">nullptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">hDecomFile</span> <span class="o">!=</span> <span class="n">INVALID_HANDLE_VALUE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ULONG</span> <span class="n">bytesWritten</span> <span class="o">=</span> <span class="mh">0x0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">status</span> <span class="o">=</span> <span class="nf">WriteFile</span><span class="p">(</span><span class="n">hDecomFile</span><span class="p">,</span> <span class="n">prefetch</span><span class="p">.</span><span class="n">payloadPtr</span><span class="p">,</span> <span class="n">FinalUncompressedSize</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bytesWritten</span><span class="p">,</span> <span class="mh">0x0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="mh">0x0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;File Written Successfully&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">VirtualFree</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MEM_RELEASE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">CleanPrefetch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">prefetch</span><span class="p">,</span> <span class="n">CompressBufferWorkSpaceSize</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="nf">println</span><span class="p">(</span><span class="s">&#34;Done&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p><img src="/posts/prefetch/image-3.png" alt="DecompressedFile"></p>
+
+      </div></div>
+
+  
+    
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h"></span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        
+        <span class="button next">
+            <a href="http://localhost:1313/posts/windows-bigpools/windows-bigpools/">
+                <span class="button__text">Windows Bigpools</span>
+                <span class="button__icon">→</span>
+            </a>
+        </span>
+        
+    </div>
+</div>
+
+  
+
+  
+    
+
+  
+</article>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright">
+        <span>© 2025 Powered by <a href="https://gohugo.io">Hugo</a></span>
+    
+      <span>:: <a href="https://github.com/mirus-ua/hugo-theme-re-terminal" target="_blank">Theme</a> made by <a href="https://github.com/mirus-ua" target="_blank">Mirus</a></span>
+      </div>
+  </div>
+</footer>
+
+
+
+
+
+
+<script type="text/javascript" src="/bundle.min.js"></script>
+
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>
