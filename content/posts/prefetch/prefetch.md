@@ -2,13 +2,9 @@
 title = "Prefetch Files"
 date = "2025-06-12T09:54:09+05:30"
 author = "5h4rrk"
-authorTwitter = "" #do not include @
 tags = ["Windows Prefetch", "Windows Forensics", "Digital Forensics", "Prefetch File Analysis", "Prefetch Parser", "Windows Performance"]
 description = "An analysis of Windows Prefetch files, their structure, forensic significance, and decompression process."
-showFullContent = false
-readingTime = false
-hideComments = false
-color = "" #color from the theme settings
+draft=false
 +++
 
 # Prefetch Files 

@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "styles.css",
-	"sourceRoot": "/mnt/e/0xsh4rk/BlogUpdated/5h4rrK.github.io",
+	"sourceRoot": "/mnt/e/0xsh4rk/BlogUpdated/NewBlog/5h4rrK.github.io",
 	"sources": [
 		"css/base.scss",
 		"themes/hugo-theme-re-terminal/assets/css/variables.scss",

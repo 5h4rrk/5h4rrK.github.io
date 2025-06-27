@@ -1,7 +1,7 @@
 baseURL = "https://5h4rrk.github.io/"
 languageCode = "en-us"
-title = "5h4rrk "
-theme = "hugo-theme-re-terminal"
+title = "shark.exe"
+theme = "hugo-PaperMod-Catpuccin"
 enableInlineShortcodes = true
 enableRobotsTXT = true
 buildDrafts = false

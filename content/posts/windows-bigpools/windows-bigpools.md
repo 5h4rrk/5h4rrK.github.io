@@ -1,15 +1,10 @@
 +++
 title = "Windows Bigpools"
 date = "2025-05-30T08:02:59+05:30"
-author = ""
-authorTwitter = "5h4rrk" 
-cover = ""
 tags = ["Windows Internals", "Memory Management", "Kernel Debugging", "BigPool"]
 keywords = ["Windows BigPool", "Windows memory allocation", "paged pool", "non-paged pool", "kernel large allocations", "MmBigPoolInformation", "Poolmon", "Windows Kernel memory"]
 description = "An overview of how the Windows Kernel handles large memory allocations using BigPools, including internal structures and debugging techniques." 
-showFullContent = false
-readingTime = true
-hideComments = true
+draft=false
 +++
 
 

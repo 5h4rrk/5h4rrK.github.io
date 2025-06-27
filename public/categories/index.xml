@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Categories on 5h4rrk </title>
+    <title>Categories on shark.exe</title>
     <link>http://localhost:1313/categories/</link>
-    <description>Recent content in Categories on 5h4rrk </description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Categories on shark.exe</description>
+    <generator>Hugo -- 0.147.8</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 11 Jan 2025 17:00:50 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Debugging</title>
-      <link>http://localhost:1313/categories/debugging/</link>
-      <pubDate>Sat, 11 Jan 2025 17:00:50 +0000</pubDate>
-      
-      <guid>http://localhost:1313/categories/debugging/</guid>
-      <description></description>
-      <content></content>
-    </item>
-    
+    <lastBuildDate>Fri, 08 Mar 2024 07:51:58 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Forensics</title>
       <link>http://localhost:1313/categories/forensics/</link>
       <pubDate>Fri, 08 Mar 2024 07:51:58 +0000</pubDate>
-      
       <guid>http://localhost:1313/categories/forensics/</guid>
       <description></description>
-      <content></content>
     </item>
-    
   </channel>
 </rss>
